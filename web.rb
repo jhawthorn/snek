@@ -13,7 +13,7 @@ post '/start' do
     # Dummy response
     response = {
         "name" => "battlesnake-ruby",
-        "color" => "#ff0000",
+        "color" => "cyan",
         "head_url" => "http://battlesnake-ruby.herokuapp.com/",
         "taunt" => "battlesnake-ruby"
     }
