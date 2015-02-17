@@ -12,8 +12,10 @@ post '/start' do
 
     # Dummy response
     response = {
-        "move" => "up",
-        "taunt" => "going up!"
+        "name" => "battlesnake-ruby",
+        "color" => "#ff0000",
+        "head_url" => "http://battlesnake-ruby.herokuapp.com/",
+        "taunt" => "battlesnake-ruby"
     }
 
     return response.to_json
@@ -30,10 +32,8 @@ post '/move' do
 
     # Dummy response
     response = {
-        "name" => "battlesnake-ruby",
-        "color" => "#ff0000",
-        "head_url" => "http://battlesnake-ruby.herokuapp.com/",
-        "taunt" => "battlesnake-ruby"
+        "move" => "up",
+        "taunt" => "going up!"
     }
 
     return response.to_json
