@@ -1,9 +1,9 @@
 require 'sinatra'
 require 'json'
+
 post '/start' do
-    request.body.rewind
     requestBody = request.body.read
-    puts(requestBody)
+
     if requestBody
         requestJson = JSON.parse(requestBody)
     else
@@ -11,15 +11,17 @@ post '/start' do
     end
 
     # Dummy response
-    {
+    response = {
         "move" => "up",
         "taunt" => "going up!"
-    }.to_json
+    }
+
+    return response.to_json
 end
+
 post '/move' do
-    request.body.rewind
     requestBody = request.body.read
-    #print(requestBody)
+
     if requestBody
         requestJson = JSON.parse(requestBody)
     else
@@ -27,23 +29,27 @@ post '/move' do
     end
 
     # Dummy response
-    {
-        "name" => "battlesnake-go",
+    response = {
+        "name" => "battlesnake-ruby",
         "color" => "#ff0000",
-        "head_url" => "http://battlesnake-go.herokuapp.com/",
-        "taunt" => "battlesnake-go"
-    }.to_json
+        "head_url" => "http://battlesnake-ruby.herokuapp.com/",
+        "taunt" => "battlesnake-ruby"
+    }
+
+    return response.to_json
 end
+
 post '/end' do
-    request.body.rewind
     requestBody = request.body.read
-    #print(requestBody)
+
     if requestBody
-        requestJson = JSON.parse(request.body.read)
+        requestJson = JSON.parse(requestBody)
     else
         requestJson = {}
     end
 
     # No response required
-    {}.to_json
+    response = {}
+
+    return response.to_json
 end
