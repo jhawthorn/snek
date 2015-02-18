@@ -3,53 +3,38 @@ require 'json'
 
 post '/start' do
     requestBody = request.body.read
-
-    if requestBody
-        requestJson = JSON.parse(requestBody)
-    else
-        requestJson = {}
-    end
+    requestJson = requestBody ? JSON.parse(requestBody) : {}
 
     # Dummy response
-    response = {
+    responseObject = {
         "name" => "battlesnake-ruby",
         "color" => "cyan",
         "head_url" => "http://battlesnake-ruby.herokuapp.com/",
         "taunt" => "battlesnake-ruby"
     }
 
-    return response.to_json
+    return responseObject.to_json
 end
 
 post '/move' do
     requestBody = request.body.read
-
-    if requestBody
-        requestJson = JSON.parse(requestBody)
-    else
-        requestJson = {}
-    end
+    requestJson = requestBody ? JSON.parse(requestBody) : {}
 
     # Dummy response
-    response = {
+    responseObject = {
         "move" => "up",
         "taunt" => "going up!"
     }
 
-    return response.to_json
+    return responseObject.to_json
 end
 
 post '/end' do
     requestBody = request.body.read
-
-    if requestBody
-        requestJson = JSON.parse(requestBody)
-    else
-        requestJson = {}
-    end
+    requestJson = requestBody ? JSON.parse(requestBody) : {}
 
     # No response required
-    response = {}
+    responseObject = {}
 
-    return response.to_json
+    return responseObject.to_json
 end
