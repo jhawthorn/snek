@@ -6,6 +6,11 @@ This is loosely based on Heroku's official [Getting Started with Ruby App](https
 
 [![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
 
+### App Overview
+
+- `web.rb` is where the three actions must be implemented: `start`, `move`, `end`
+
+- Each handler is already set up to parse and render JSON.
 
 ### Running the AI locally
 
