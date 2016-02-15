@@ -1,16 +1,24 @@
 require 'sinatra'
 require 'json'
 
+get '/' do
+    responseObject = {
+        "color"=> "#fff000",
+        "head_url"=> "url/to/your/img/file"
+    }
+
+    return responseObject.to_json
+end
+
 post '/start' do
     requestBody = request.body.read
     requestJson = requestBody ? JSON.parse(requestBody) : {}
 
+    # Get ready to start a game with the request data
+
     # Dummy response
     responseObject = {
-        "name" => "battlesnake-ruby",
-        "color" => "cyan",
-        "head_url" => "http://battlesnake-ruby.herokuapp.com/",
-        "taunt" => "battlesnake-ruby"
+        "taunt" => "battlesnake-ruby",
     }
 
     return responseObject.to_json
@@ -20,10 +28,12 @@ post '/move' do
     requestBody = request.body.read
     requestJson = requestBody ? JSON.parse(requestBody) : {}
 
+    # Calculate a move with the request data
+
     # Dummy response
     responseObject = {
-        "move" => "up",
-        "taunt" => "going up!"
+        "move" => "north", # One of either "north", "east", "south", or "west".
+        "taunt" => "going north!",
     }
 
     return responseObject.to_json
