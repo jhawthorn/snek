@@ -1,6 +1,6 @@
-# battlesnake-ruby
+# starter-snake-ruby
 
-A simple [BattleSnake AI](http://battlesnake.io) written in Ruby with [Sinatra](http://www.sinatrarb.com/).
+A simple [Battlesnake AI](http://battlesnake.io) written in Ruby with [Sinatra](http://www.sinatrarb.com/).
 
 This is loosely based on Heroku's official [Getting Started with Ruby App](https://github.com/heroku/ruby-getting-started).
 
