@@ -25,8 +25,8 @@ If you're opting for rbenv, this might be handy: [Install Ruby](https://jasoncha
 #### 2. Fork and clone this repo:
 
 ```
-git clone https://github.com/sendwithus/battlesnake-ruby.git
-cd battlesnake-ruby
+git clone git@github.com:battlesnakeio/starter-snake-ruby.git
+cd starter-snake-ruby
 ```
 
 #### 3. Install [Bundler](https://bundler.io/):
