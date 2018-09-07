@@ -12,22 +12,36 @@ This is loosely based on Heroku's official [Getting Started with Ruby App](https
 
 - Each handler is already set up to parse and render JSON.
 
-### Running the AI locally
+### Setup and Installation
 
-Fork and clone this repo:
+
+#### 1. Install Ruby
+
+These steps assume you've installed ruby locally. If you haven't, a good Ruby version manager is [rbenv](https://github.com/rbenv/rbenv) or [asdf](https://github.com/asdf-vm/asdf) with [asdf ruby](https://github.com/asdf-vm/asdf-ruby). 
+
+If you're opting for rbenv, this might be handy: [Install Ruby](https://jasoncharnes.com/install-ruby)
+
+
+#### 2. Fork and clone this repo:
 
 ```
 git clone https://github.com/sendwithus/battlesnake-ruby.git
 cd battlesnake-ruby
 ```
 
-Install dependencies:
+#### 3. Install [Bundler](https://bundler.io/):
+
+```
+gem install bundler
+```
+
+#### 4. Install dependencies:
 
 ```
 bundle install
 ```
 
-Run the server:
+#### 5. Run the server:
 
 ```
 foreman start web
