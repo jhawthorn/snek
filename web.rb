@@ -41,3 +41,7 @@ post '/end' do
 
     return responseObject.to_json
 end
+
+post '/ping' do
+  200
+end
