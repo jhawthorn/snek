@@ -2,7 +2,8 @@ require 'sinatra'
 require 'json'
 
 get '/' do
-    'Battlesnake 2018'
+    'Battlesnake documentation can be found at' \
+    '<a href=\"https://battlesnake.io/docs\">https://battlesnake.io/docs</a>.'
 end
 
 post '/start' do
