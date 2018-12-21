@@ -3,7 +3,7 @@ require 'json'
 
 get '/' do
     'Battlesnake documentation can be found at' \
-    '<a href=\"https://battlesnake.io/docs\">https://battlesnake.io/docs</a>.'
+     '<a href=\"https://docs.battlesnake.io\">https://docs.battlesnake.io</a>.'
 end
 
 post '/start' do
