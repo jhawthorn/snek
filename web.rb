@@ -1,5 +1,6 @@
 require 'sinatra'
 require 'json'
+require "sinatra/json"
 
 get '/' do
   'Battlesnake documentation can be found at' \
@@ -7,40 +8,66 @@ get '/' do
 end
 
 post '/start' do
-  requestBody = request.body.read
-  requestJson = requestBody ? JSON.parse(requestBody) : {}
-
-  # Example response
-  responseObject = {
+  json(
     "color"=> "#fff000",
-  }
+  )
+end
 
-  return responseObject.to_json
+class Snake
+  def initialize(data)
+    @id = data['id']
+    @health = data['health']
+    @body = data['body']
+  end
+end
+
+class Board
+  def initialize(data)
+    @width = data['width']
+    @height = data['height']
+    @snakes = data['snakes'].map { |s| Snake.new(s) }
+  end
+
+  def initialize_copy(other)
+    super(other)
+
+    @snakes = @snakes.map(&:dup)
+  end
+end
+
+class Game
+  attr_reader :id, :turn, :self_id, :board
+
+  def initialize(data)
+    @id = data['game']['id']
+    @turn = data['turn']
+    @self_id = data['you']['id']
+    @board = Board.new(data['board'])
+  end
+
+  def initialize_copy(other)
+    super(other)
+    @board = @board.dup
+  end
 end
 
 post '/move' do
   requestBody = request.body.read
   requestJson = requestBody ? JSON.parse(requestBody) : {}
 
+  game = Game.new(requestJson)
+  p game.dup
+
   # Calculate a direction (example)
   direction = ["up", "right"].sample
 
-  # Example response
-  responseObject = {
+  json(
     "move" => direction
-  }
-
-  return responseObject.to_json
+  )
 end
 
 post '/end' do
-  requestBody = request.body.read
-  requestJson = requestBody ? JSON.parse(requestBody) : {}
-
-  # No response required
-  responseObject = {}
-
-  return responseObject.to_json
+  json({})
 end
 
 post '/ping' do
