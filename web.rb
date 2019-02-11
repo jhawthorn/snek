@@ -71,10 +71,18 @@ class Snake
     health > 0
   end
 
+  def head
+    @body[0]
+  end
+
+  def length
+    @body.length
+  end
+
   def simulate!(action, game)
     board = game.board
 
-    point = @body[0].move(action)
+    point = head.move(action)
 
     p board.height
     if point.x < 0 || point.y < 0 || point.x >= board.width || point.y >= board.height
