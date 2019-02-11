@@ -84,8 +84,7 @@ class Snake
 
     point = head.move(action)
 
-    p board.height
-    if point.x < 0 || point.y < 0 || point.x >= board.width || point.y >= board.height
+    if board.out_of_bounds?(point)
       @health = 0
     elsif @body.include?(point)
       @health = 0
@@ -111,6 +110,14 @@ class Board
     super(other)
 
     @snakes = @snakes.map(&:dup)
+  end
+
+  def out_of_bounds?(x, y=nil)
+    unless y
+      y = x.y
+      x = x.x
+    end
+    x < 0 || y < 0 || x >= @width || y >= @height
   end
 end
 
