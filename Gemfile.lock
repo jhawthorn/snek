@@ -1,6 +1,8 @@
 GEM
   remote: https://rubygems.org/
   specs:
+    foreman (0.85.0)
+      thor (~> 0.19.1)
     json (2.1.0)
     mustermann (1.0.3)
     rack (2.0.5)
@@ -11,14 +13,16 @@ GEM
       rack (~> 2.0)
       rack-protection (= 2.0.3)
       tilt (~> 2.0)
+    thor (0.19.4)
     tilt (2.0.8)
 
 PLATFORMS
   ruby
 
 DEPENDENCIES
+  foreman
   json (~> 2.1.0)
   sinatra (~> 2.0.3)
 
 BUNDLED WITH
-   1.16.4
+   1.17.3
