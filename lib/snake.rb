@@ -2,6 +2,8 @@ require "securerandom"
 
 ACTIONS = [:up, :down, :left, :right]
 
+SCORE_MIN = -999999999
+
 class Point
   attr_reader :x, :y
 
@@ -88,8 +90,6 @@ class Snake
   end
 
   def simulate!(action, game)
-    board = game.board
-
     point = head.move(action)
 
     @body.unshift(point)
@@ -353,7 +353,7 @@ class GameScorer
 
   def score
     player = @game.player
-    return -999999 unless player.alive?
+    return SCORE_MIN unless player.alive?
 
     enemies = @game.enemies.select(&:alive?)
 
@@ -384,29 +384,60 @@ class MoveDecider
     end
   end
 
-  def next_move
-    reasonable_moves = Hash[
-      @snakes.map do |snake|
-        moves = ACTIONS.reject do |move|
-          head = snake.head
-          new_head = head.move(move)
+  def reasonable_moves
+    @reasonable_moves ||=
+      Hash[
+        @snakes.map do |snake|
+          moves = ACTIONS.reject do |move|
+            head = snake.head
+            new_head = head.move(move)
 
-          board.out_of_bounds?(new_head) || @walls.at(new_head)
+            board.out_of_bounds?(new_head) || @walls.at(new_head)
+          end
+
+          [snake.id, moves]
         end
+      ]
+  end
 
-        [snake, moves]
-      end
-    ]
+  def next_move
+    possibilities = all_move_combinations.to_a
 
-    ACTIONS.max_by do |action|
-      game = @game.simulate({
-        @game.player.id => action
-      })
+    possibilities.map! do |moves|
+      game = @game.simulate(moves)
 
       score = GameScorer.new(game).score
-      pp(action: action, player: game.player, score: score)
 
-      score
+      [moves, score]
+    end
+
+    player_id = @game.player.id
+    reasonable_moves[player_id].max_by do |action|
+      relevant =
+        possibilities.select do |(possibility, score)|
+          possibility[player_id] == action
+        end
+
+      relevant.map(&:last).min
+    end
+  end
+
+  def all_move_combinations(possible_moves = reasonable_moves)
+    return enum_for(__method__, possible_moves) unless block_given?
+
+    if possible_moves.empty?
+      return yield({})
+    end
+
+    snake_id = possible_moves.keys.first
+
+    remaining_moves = possible_moves.dup
+    my_moves = remaining_moves.delete(snake_id)
+
+    my_moves.each do |my_move|
+      all_move_combinations(remaining_moves) do |other_moves|
+        yield({ snake_id => my_move }.merge(other_moves))
+      end
     end
   end
 end
