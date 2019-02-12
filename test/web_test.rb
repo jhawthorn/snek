@@ -2,7 +2,7 @@ require "test_helper"
 
 require File.expand_path("../web", __dir__)
 
-class WebTest < MiniTest::Unit::TestCase
+class WebTest < MiniTest::Test
 
   include Rack::Test::Methods
 
