@@ -1,16 +1,20 @@
+require "securerandom"
+
 ACTIONS = [:up, :down, :left, :right]
 
 class Point
   attr_reader :x, :y
 
-  def initialize(data, y=nil)
-    if y
-      @x = data
-      @y = y
-    else
-      @x = data['x']
-      @y = data['y']
-    end
+  def initialize(x, y)
+    @x = x
+    @y = y
+  end
+
+  def self.from_json(data)
+    new(
+      data['x'],
+      data['y']
+    )
   end
 
   def move(direction)
@@ -39,8 +43,6 @@ class Point
   end
 end
 
-require "securerandom"
-
 class Snake
   attr_reader :id, :health, :body
   attr_writer :health
@@ -55,7 +57,7 @@ class Snake
     new(
       id: data['id'],
       health: data['health'],
-      body: data['body'].map { |p| Point.new(p) }
+      body: data['body'].map { |p| Point.from_json(p) }
     )
   end
 
@@ -150,11 +152,20 @@ end
 class Board
   attr_reader :snakes, :width, :height, :food
 
-  def initialize(data)
-    @width = data['width']
-    @height = data['height']
-    @snakes = data['snakes'].map { |s| Snake.new(s) }
-    @food = data['food'].map { |f| Point.new(f) }
+  def initialize(width:, height: width, snakes: [], food: [])
+    @width = width
+    @height = height
+    @snakes = snakes
+    @food = food
+  end
+
+  def self.from_json(data)
+    new(
+      width: data['width'],
+      height: data['height'],
+      snakes: data['snakes'].map { |s| Snake.from_json(s) },
+      food: data['food'].map { |f| Point.from_json(f) }
+    )
   end
 
   def initialize_copy(other)
@@ -180,11 +191,20 @@ end
 class Game
   attr_reader :id, :turn, :self_id, :board
 
-  def initialize(data)
-    @id = data['game']['id']
-    @turn = data['turn']
-    @self_id = data['you']['id']
-    @board = Board.new(data['board'])
+  def initialize(id: nil, turn: 0, self_id:, board:)
+    @id = id || SecureRandom.hex
+    @turn = turn
+    @self_id = self_id
+    @board = board
+  end
+
+  def self.from_json(data)
+    new(
+      id: data['game']['id'],
+      turn: data['turn'],
+      self_id: data['you']['id'],
+      board: Board.from_json(data['board'])
+    )
   end
 
   def initialize_copy(other)

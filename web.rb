@@ -19,7 +19,7 @@ post '/move' do
   requestBody = request.body.read
   requestJson = requestBody ? JSON.parse(requestBody) : {}
 
-  game = Game.new(requestJson)
+  game = Game.from_json(requestJson)
   move = MoveDecider.new(game).next_move
 
   json(
