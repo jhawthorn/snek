@@ -56,6 +56,10 @@ class WebTest < MiniTest::Unit::TestCase
           {
             "x": 1,
             "y": 3
+          },
+          {
+            "x": 2,
+            "y": 3
           }
         ]
       }
@@ -64,13 +68,7 @@ class WebTest < MiniTest::Unit::TestCase
   "you": {
     "id": "snake-id-string",
     "name": "Sneky Snek",
-    "health": 90,
-    "body": [
-      {
-        "x": 1,
-        "y": 3
-      }
-    ]
+    "health": 90
   }
 }
   JSON

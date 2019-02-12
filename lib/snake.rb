@@ -41,6 +41,7 @@ end
 
 class Snake
   attr_reader :id, :health, :body
+  attr_writer :health
 
   def initialize(data)
     @id = data['id']
@@ -70,15 +71,17 @@ class Snake
     @body.length
   end
 
+  def die!
+    @health = 0
+  end
+
   def simulate!(action, game)
     board = game.board
 
     point = head.move(action)
 
     if board.out_of_bounds?(point)
-      @health = 0
-    elsif @body.include?(point)
-      @health = 0
+      die!
     end
 
     @body.unshift(point)
@@ -96,7 +99,7 @@ class Grid
     @grid = Array.new(width * height)
   end
 
-  def [](x, y=nil)
+  def get(x, y=nil)
     unless y
       y = x.y
       x = x.x
@@ -104,21 +107,29 @@ class Grid
     return nil if x < 0 || y < 0 || x >= @width || y >= @height
     @grid[y * @width + x]
   end
+  alias_method :at, :get
 
-  def []=(x, y, value=nil)
+  def set(x, y, value=nil)
     unless value
       value = y
       y = x.y
       x = x.x
     end
-    return if x < 0 || y < 0 || x >= @width || y >= @height
+    raise if x < 0 || y < 0 || x >= @width || y >= @height
     @grid[y * @width + x] = value
   end
 
   def set_all(points, value)
     points.each do |point|
-      self[point] = value
+      self.set(point, value)
     end
+  end
+
+  def inspect
+    values = @grid.map(&:inspect)
+    hsize = values.map(&:size).max + 1
+    values.map! { |v| v.ljust(hsize) }
+    "#<Grid #{@width}x#{@height}\n" + values.each_slice(@width).map(&:join).join("\n") + "\n>"
   end
 end
 
@@ -192,12 +203,36 @@ class Game
     end
 
     snakes.each do |snake|
+      snake.health -= 1
+    end
+
+    snakes.each do |snake|
       if board.food.include?(snake.head)
         board.food.delete(snake.head)
       elsif actions[snake.id]
         snake.body.pop
       else
         # We didn't simulate a move
+      end
+    end
+
+    heads = snakes.group_by(&:head)
+    walls = Grid.new(board.width, board.height)
+    snakes.each do |snake|
+      walls.set_all(snake.tail, true)
+    end
+
+    snakes.each do |snake|
+      if walls.at(snake.head)
+        snake.die!
+      end
+
+      heads[snake.head].each do |other|
+        next if other.equal?(snake)
+
+        if other.length >= snake.length
+          snake.die!
+        end
       end
     end
   end
@@ -231,7 +266,7 @@ class BoardBFS
       next_queue << [snake.head.x, snake.head.y, snake]
 
       snake.tail.each do |point|
-        visited[point] = true
+        visited.set(point, true)
       end
     end
 
@@ -242,12 +277,12 @@ class BoardBFS
 
       queue.each do |x, y, snake|
         next if board.out_of_bounds?(x, y)
-        next if visited[x,y]
-        visited[x,y] = true
+        next if visited.at(x,y)
+        visited.set(x, y, true)
 
         @voronoi_tiles[snake] += 1
 
-        if food[x,y]
+        if food.at(x,y)
           @distance_to_food[snake] ||= distance
         end
 
@@ -276,14 +311,14 @@ class GameScorer
     enemies = @game.enemies.select(&:alive?)
 
     [
-        10 * player.length,
+        25 * player.length,
          1 * player.health,
       -100 * enemies.count,
         -1 * (enemies.map(&:length).max || 0),
         -1 * enemies.sum(&:length),
 
          1 * bfs.voronoi_tiles[player],
-        -2 * (bfs.distance_to_food[player] || board.width),
+        -1 * (bfs.distance_to_food[player] || @game.board.width),
     ].sum
   end
 end
