@@ -13,6 +13,12 @@ class Point
     end
   end
 
+  def set_all(points, value)
+    points.each do |point|
+      self[point] = value
+    end
+  end
+
   def move(direction)
     case direction
     when :up
@@ -153,8 +159,16 @@ class Game
     @board = @board.dup
   end
 
+  def snakes
+    @board.snakes
+  end
+
   def player
-    @board.snakes.detect { |s| s.id == @self_id }
+    snakes.detect { |s| s.id == @self_id }
+  end
+
+  def enemies
+    snakes - [player]
   end
 
   def simulate(actions)
@@ -191,16 +205,24 @@ class GameScorer
   end
 
   def score
-    if !@game.player.alive?
-      return -999999
-    end
+    player = @game.player
+    return -999999 unless player.alive?
 
-    @game.player.length * 10
+    enemies = @game.enemies.select(&:alive?)
+
+    [
+        10 * player.length,
+         1 * player.health,
+      -100 * enemies.count,
+        -1 * enemies.map(&:length).max,
+        -1 * enemies.sum(&:length)
+    ].sum
   end
 end
 
 class MoveDecider
   attr_reader :game
+
   def initialize(game)
     @game = game
   end
@@ -208,7 +230,7 @@ class MoveDecider
   def next_move
     self_id = @game.self_id
 
-    ACTIONS.max_by do |action|
+    ACTIONS.shuffle.max_by do |action|
       game = @game.simulate({
         self_id => action
       })
