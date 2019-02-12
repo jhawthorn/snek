@@ -14,14 +14,14 @@ task :profile do
   require "json"
   require "stackprof"
 
-  fixture = File.read("#{__dir__}/test/fixtures/4_player_large_game.json")
+  fixture = File.read("#{__dir__}/test/fixtures/8_player_large_game.json")
   game = Game.from_json(JSON.parse(fixture))
   MoveDecider.new(game).next_move
 
   puts "Profiling..."
   output = "stackprof-cpu-snake.dump"
   StackProf.run(mode: :cpu, out: output) do
-    20.times do
+    10.times do
       MoveDecider.new(game).next_move
     end
   end
