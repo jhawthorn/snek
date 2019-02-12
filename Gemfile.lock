@@ -44,6 +44,7 @@ PLATFORMS
 
 DEPENDENCIES
   foreman
+  minitest
   shotgun
   sinatra (~> 2.0.3)
   sinatra-contrib
