@@ -76,7 +76,7 @@ class Snake
   end
 
   def tail
-    @body.reject { |x| x == head }
+    @body.drop_while { |x| x == head }
   end
 
   def length
