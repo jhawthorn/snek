@@ -1,5 +1,7 @@
 require "sinatra"
 require "sinatra/json"
+
+$LOAD_PATH.unshift "#{__dir__}/lib"
 require "snake"
 
 get '/' do
