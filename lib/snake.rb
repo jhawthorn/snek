@@ -414,7 +414,7 @@ class MoveDecider
     player_id = @game.player.id
     reasonable_moves[player_id].max_by do |action|
       relevant =
-        possibilities.select do |(possibility, score)|
+        possibilities.select do |(possibility, _)|
           possibility[player_id] == action
         end
 
