@@ -39,14 +39,24 @@ class Point
   end
 end
 
+require "securerandom"
+
 class Snake
   attr_reader :id, :health, :body
   attr_writer :health
 
-  def initialize(data)
-    @id = data['id']
-    @health = data['health']
-    @body = data['body'].map { |p| Point.new(p) }
+  def initialize(id: nil, health: 100, body: [])
+    @id = id || SecureRandom.hex
+    @health = health
+    @body = body
+  end
+
+  def self.from_json(data)
+    new(
+      id: data['id'],
+      health: data['health'],
+      body: data['body'].map { |p| Point.new(p) }
+    )
   end
 
   def initialize_copy(other)
@@ -64,7 +74,7 @@ class Snake
   end
 
   def tail
-    @body[1, @body.length]
+    @body.reject { |x| x == head }
   end
 
   def length
@@ -80,13 +90,17 @@ class Snake
 
     point = head.move(action)
 
-    if board.out_of_bounds?(point)
-      die!
-    end
-
     @body.unshift(point)
 
     self
+  end
+
+  def hash
+    id.hash
+  end
+
+  def ==(other)
+    id == other.id
   end
 end
 
@@ -148,6 +162,10 @@ class Board
 
     @snakes = @snakes.map(&:dup)
     @food = @food.map(&:dup)
+  end
+
+  def new_grid
+    Grid.new(@width, @height)
   end
 
   def out_of_bounds?(x, y=nil)
@@ -223,16 +241,26 @@ class Game
     end
 
     snakes.each do |snake|
-      if walls.at(snake.head)
+      if board.out_of_bounds?(snake.head)
         snake.die!
+        break
       end
 
-      heads[snake.head].each do |other|
-        next if other.equal?(snake)
+      if walls.at(snake.head)
+        snake.die!
+        break
+      end
 
-        if other.length >= snake.length
-          snake.die!
+      lost_collision =
+        heads[snake.head].any? do |other|
+          next if other.equal?(snake)
+
+          other.length >= snake.length
         end
+
+      if lost_collision
+        snake.die!
+        break
       end
     end
   end
@@ -298,15 +326,14 @@ class BoardBFS
 end
 
 class GameScorer
-  def initialize(game)
+  def initialize(game, bfs: nil)
     @game = game
+    @bfs = bfs || BoardBFS.new(@game)
   end
 
   def score
     player = @game.player
     return -999999 unless player.alive?
-
-    bfs = BoardBFS.new(@game)
 
     enemies = @game.enemies.select(&:alive?)
 
@@ -317,25 +344,43 @@ class GameScorer
         -1 * (enemies.map(&:length).max || 0),
         -1 * enemies.sum(&:length),
 
-         1 * bfs.voronoi_tiles[player],
-        -1 * (bfs.distance_to_food[player] || @game.board.width),
+         1 * @bfs.voronoi_tiles[player],
+        -1 * (@bfs.distance_to_food[player] || @game.board.width),
     ].sum
   end
 end
 
 class MoveDecider
-  attr_reader :game
+  attr_reader :game, :board
 
   def initialize(game)
     @game = game
+    @board = game.board
+
+    @walls = board.new_grid
+    @snakes = @game.snakes.select(&:alive?)
+    @snakes.each do |snake|
+      @walls.set_all(snake.body, true)
+    end
   end
 
   def next_move
-    self_id = @game.self_id
+    reasonable_moves = Hash[
+      @snakes.map do |snake|
+        moves = ACTIONS.reject do |move|
+          head = snake.head
+          new_head = head.move(move)
 
-    ACTIONS.shuffle.max_by do |action|
+          board.out_of_bounds?(new_head) || @walls.at(new_head)
+        end
+
+        [snake, moves]
+      end
+    ]
+
+    ACTIONS.max_by do |action|
       game = @game.simulate({
-        self_id => action
+        @game.player.id => action
       })
 
       score = GameScorer.new(game).score
