@@ -13,12 +13,6 @@ class Point
     end
   end
 
-  def set_all(points, value)
-    points.each do |point|
-      self[point] = value
-    end
-  end
-
   def move(direction)
     case direction
     when :up
@@ -68,6 +62,10 @@ class Snake
     @body[0]
   end
 
+  def tail
+    @body[1, @body.length]
+  end
+
   def length
     @body.length
   end
@@ -115,6 +113,12 @@ class Grid
     end
     return if x < 0 || y < 0 || x >= @width || y >= @height
     @grid[y * @width + x] = value
+  end
+
+  def set_all(points, value)
+    points.each do |point|
+      self[point] = value
+    end
   end
 end
 
@@ -199,6 +203,65 @@ class Game
   end
 end
 
+class BoardBFS
+  attr_reader :game, :board
+
+  attr_reader :voronoi_tiles
+  attr_reader :distance_to_food
+
+  def initialize(game)
+    @game = game
+    @board = game.board
+
+    @voronoi_tiles = Hash.new(0)
+    @distance_to_food = {}
+
+    calculate
+  end
+
+  def calculate
+    visited = Grid.new(board.width, board.height)
+    food = Grid.new(board.width, board.height)
+
+    next_queue = []
+
+    food.set_all(board.food, true)
+
+    @game.snakes.each do |snake|
+      next_queue << [snake.head.x, snake.head.y, snake]
+
+      snake.tail.each do |point|
+        visited[point] = true
+      end
+    end
+
+    distance = 0
+    until next_queue.empty?
+      queue = next_queue
+      next_queue = []
+
+      queue.each do |x, y, snake|
+        next if board.out_of_bounds?(x, y)
+        next if visited[x,y]
+        visited[x,y] = true
+
+        @voronoi_tiles[snake] += 1
+
+        if food[x,y]
+          @distance_to_food[snake] ||= distance
+        end
+
+        next_queue << [x+1, y, snake]
+        next_queue << [x-1, y, snake]
+        next_queue << [x, y+1, snake]
+        next_queue << [x, y-1, snake]
+      end
+
+      distance += 1
+    end
+  end
+end
+
 class GameScorer
   def initialize(game)
     @game = game
@@ -208,6 +271,8 @@ class GameScorer
     player = @game.player
     return -999999 unless player.alive?
 
+    bfs = BoardBFS.new(@game)
+
     enemies = @game.enemies.select(&:alive?)
 
     [
@@ -215,7 +280,10 @@ class GameScorer
          1 * player.health,
       -100 * enemies.count,
         -1 * (enemies.map(&:length).max || 0),
-        -1 * enemies.sum(&:length)
+        -1 * enemies.sum(&:length),
+
+         1 * bfs.voronoi_tiles[player],
+        -2 * (bfs.distance_to_food[player] || board.width),
     ].sum
   end
 end
