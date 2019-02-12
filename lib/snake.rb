@@ -1,3 +1,5 @@
+ACTIONS = [:up, :down, :left, :right]
+
 class Point
   attr_reader :x, :y
 
@@ -170,8 +172,6 @@ class Game
     end
   end
 end
-
-ACTIONS = [:up, :down, :left, :right]
 
 class MoveDecider
   attr_reader :game
