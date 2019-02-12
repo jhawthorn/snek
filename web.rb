@@ -19,22 +19,11 @@ post '/move' do
   requestBody = request.body.read
   requestJson = requestBody ? JSON.parse(requestBody) : {}
 
-  original_game = Game.new(requestJson)
-  self_id = original_game.self_id
-
-  action =
-    ACTIONS.shuffle.detect do |action|
-      game = original_game.simulate({
-        self_id => action
-      })
-
-      p(action => game.player)
-
-      game.player.alive?
-    end
+  game = Game.new(requestJson)
+  move = MoveDecider.new(game).next_move
 
   json(
-    "move" => (action || :down)
+    "move" => (move || :down)
   )
 end
 

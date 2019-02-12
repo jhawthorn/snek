@@ -172,3 +172,25 @@ class Game
 end
 
 ACTIONS = [:up, :down, :left, :right]
+
+class MoveDecider
+  attr_reader :game
+  def initialize(game)
+    @game = game
+  end
+
+  def next_move
+    self_id = @game.self_id
+
+    ACTIONS.shuffle.detect do |action|
+      game = @game.simulate({
+        self_id => action
+      })
+
+      p(action => game.player)
+
+      game.player.alive?
+    end
+  end
+end
+
