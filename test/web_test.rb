@@ -77,7 +77,7 @@ class WebTest < MiniTest::Unit::TestCase
 
   def test_move
     post '/move', FULL_MOVE_PAYLOAD
-    assert last_response.ok?
+    assert last_response.ok?, last_response.body
     refute_predicate last_response.body, :empty?
 
     json = JSON.parse(last_response.body)

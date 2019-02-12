@@ -119,13 +119,14 @@ class Board
     @width = data['width']
     @height = data['height']
     @snakes = data['snakes'].map { |s| Snake.new(s) }
-    @food = data['food']
+    @food = data['food'].map { |f| Point.new(f) }
   end
 
   def initialize_copy(other)
     super(other)
 
     @snakes = @snakes.map(&:dup)
+    @food = @food.map(&:dup)
   end
 
   def out_of_bounds?(x, y=nil)
@@ -163,13 +164,38 @@ class Game
   end
 
   def simulate!(actions)
-    board.snakes.each do |snake|
-      next unless snake.alive?
+    snakes = board.snakes.select(&:alive?)
+
+    snakes.each do |snake|
       action = actions[snake.id]
       next unless action
 
       snake.simulate!(action, self)
     end
+
+    snakes.each do |snake|
+      if board.food.include?(snake.head)
+        board.food.delete(snake.head)
+      elsif actions[snake.id]
+        snake.body.pop
+      else
+        # We didn't simulate a move
+      end
+    end
+  end
+end
+
+class GameScorer
+  def initialize(game)
+    @game = game
+  end
+
+  def score
+    if !@game.player.alive?
+      return -999999
+    end
+
+    @game.player.length * 10
   end
 end
 
@@ -182,14 +208,15 @@ class MoveDecider
   def next_move
     self_id = @game.self_id
 
-    ACTIONS.shuffle.detect do |action|
+    ACTIONS.max_by do |action|
       game = @game.simulate({
         self_id => action
       })
 
-      p(action => game.player)
+      score = GameScorer.new(game).score
+      pp(action: action, player: game.player, score: score)
 
-      game.player.alive?
+      score
     end
   end
 end
