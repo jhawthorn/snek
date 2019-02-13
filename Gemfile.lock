@@ -57,6 +57,3 @@ DEPENDENCIES
   sinatra (~> 2.0.3)
   sinatra-contrib
   stackprof
-
-BUNDLED WITH
-   2.0.1
