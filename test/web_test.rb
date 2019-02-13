@@ -32,6 +32,21 @@ class WebTest < MiniTest::Test
     assert last_response.ok?
   end
 
+  def assert_success_from_payload(payload)
+    post '/move', FULL_MOVE_PAYLOAD
+    assert last_response.ok?, last_response.body
+    refute_predicate last_response.body, :empty?
+
+    json = JSON.parse(last_response.body)
+
+    # It returns a valid move
+    move = json['move']
+    assert_includes %w[up down left right], move
+
+    # That's all it is
+    assert_equal({ "move" => move }, json)
+  end
+
   FULL_MOVE_PAYLOAD = <<~JSON
 {
   "game": {
@@ -74,16 +89,11 @@ class WebTest < MiniTest::Test
   JSON
 
   def test_move
-    post '/move', FULL_MOVE_PAYLOAD
-    assert last_response.ok?, last_response.body
-    refute_predicate last_response.body, :empty?
+    assert_success_from_payload(FULL_MOVE_PAYLOAD)
+  end
 
-    json = JSON.parse(last_response.body)
-
-    # It returns a valid move
-    assert_includes %w[up down left right], json['move']
-
-    # That's all it is
-    assert_equal({ "move" => json['move'] }, json)
+  LIVE_PAYLOAD = '{"game":{"id":"684e74c2-68d6-4e58-a041-9d0c348161bb"},"turn":0,"board":{"height":11,"width":11,"food":[{"x":3,"y":7}],"snakes":[{"id":"gs_KGTDGScKhKSFYB8VPjm3pFJb","name":"snek","health":100,"body":[{"x":1,"y":1},{"x":1,"y":1},{"x":1,"y":1}]},{"id":"gs_tcbXTtDddv4dCVwgmq4r9T9d","name":"snek","health":100,"body":[{"x":9,"y":9},{"x":9,"y":9},{"x":9,"y":9}]}]},"you":{"id":"gs_tcbXTtDddv4dCVwgmq4r9T9d","name":"snek","health":100,"body":[{"x":9,"y":9},{"x":9,"y":9},{"x":9,"y":9}]}}'
+  def move_from_play_battlesnake_io
+    assert_success_from_payload(LIVE_PAYLOAD)
   end
 end
