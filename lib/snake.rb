@@ -2,8 +2,12 @@ require "securerandom"
 
 unless [].respond_to?(:sum)
   class Array
-    def sum
-      inject(0, :+)
+    def sum(&block)
+      if block_given?
+        map(&block).inject(0, :+)
+      else
+        inject(0, :+)
+      end
     end
   end
 end
