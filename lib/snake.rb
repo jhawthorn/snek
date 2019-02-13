@@ -1,5 +1,13 @@
 require "securerandom"
 
+unless [].respond_to?(:sum)
+  class Array
+    def sum
+      inject(0, :+)
+    end
+  end
+end
+
 ACTIONS = [:up, :down, :left, :right]
 
 SCORE_MIN = -999999999
