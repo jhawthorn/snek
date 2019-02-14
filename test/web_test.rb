@@ -97,7 +97,7 @@ class WebTest < MiniTest::Test
     JSON
   end
 
-  def test_regression_payload
+  def test_regression_one_dead_snake
     assert_success_from_payload <<-JSON
 {"game":{"id":"1550135655128486549"},"turn":1,"board":{"height":10,"width":10,"food":[{"x":1,"y":1}],"snakes":[{"id":"you","name":"you","health":0,"body":[{"x":2,"y":2}]}]},"you":{"id":"you","name":"you","health":0,"body":[{"x":2,"y":2}]}}
     JSON

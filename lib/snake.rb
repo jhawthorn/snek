@@ -429,6 +429,9 @@ class MoveDecider
   end
 
   def next_move
+    # I don't know why the game server asks us this...
+    return ACTIONS.sample if @snakes.none?
+
     possibilities = all_move_combinations.to_a
 
     possibilities.map! do |moves|
