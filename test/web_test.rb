@@ -33,7 +33,7 @@ class WebTest < MiniTest::Test
   end
 
   def assert_success_from_payload(payload)
-    post '/move', FULL_MOVE_PAYLOAD
+    post '/move', payload
     assert last_response.ok?, last_response.body
     refute_predicate last_response.body, :empty?
 
@@ -47,7 +47,8 @@ class WebTest < MiniTest::Test
     assert_equal({ "move" => move }, json)
   end
 
-  FULL_MOVE_PAYLOAD = <<~JSON
+  def test_example_move
+    assert_success_from_payload <<~JSON
 {
   "game": {
     "id": "game-id-string"
@@ -88,12 +89,17 @@ class WebTest < MiniTest::Test
 }
   JSON
 
-  def test_move
-    assert_success_from_payload(FULL_MOVE_PAYLOAD)
   end
 
-  LIVE_PAYLOAD = '{"game":{"id":"684e74c2-68d6-4e58-a041-9d0c348161bb"},"turn":0,"board":{"height":11,"width":11,"food":[{"x":3,"y":7}],"snakes":[{"id":"gs_KGTDGScKhKSFYB8VPjm3pFJb","name":"snek","health":100,"body":[{"x":1,"y":1},{"x":1,"y":1},{"x":1,"y":1}]},{"id":"gs_tcbXTtDddv4dCVwgmq4r9T9d","name":"snek","health":100,"body":[{"x":9,"y":9},{"x":9,"y":9},{"x":9,"y":9}]}]},"you":{"id":"gs_tcbXTtDddv4dCVwgmq4r9T9d","name":"snek","health":100,"body":[{"x":9,"y":9},{"x":9,"y":9},{"x":9,"y":9}]}}'
-  def move_from_play_battlesnake_io
-    assert_success_from_payload(LIVE_PAYLOAD)
+  def test_move_from_play_battlesnake_io
+    assert_success_from_payload <<-JSON
+{"game":{"id":"684e74c2-68d6-4e58-a041-9d0c348161bb"},"turn":0,"board":{"height":11,"width":11,"food":[{"x":3,"y":7}],"snakes":[{"id":"gs_KGTDGScKhKSFYB8VPjm3pFJb","name":"snek","health":100,"body":[{"x":1,"y":1},{"x":1,"y":1},{"x":1,"y":1}]},{"id":"gs_tcbXTtDddv4dCVwgmq4r9T9d","name":"snek","health":100,"body":[{"x":9,"y":9},{"x":9,"y":9},{"x":9,"y":9}]}]},"you":{"id":"gs_tcbXTtDddv4dCVwgmq4r9T9d","name":"snek","health":100,"body":[{"x":9,"y":9},{"x":9,"y":9},{"x":9,"y":9}]}}
+    JSON
+  end
+
+  def test_regression_payload
+    assert_success_from_payload <<-JSON
+{"game":{"id":"1550135655128486549"},"turn":1,"board":{"height":10,"width":10,"food":[{"x":1,"y":1}],"snakes":[{"id":"you","name":"you","health":0,"body":[{"x":2,"y":2}]}]},"you":{"id":"you","name":"you","health":0,"body":[{"x":2,"y":2}]}}
+    JSON
   end
 end
