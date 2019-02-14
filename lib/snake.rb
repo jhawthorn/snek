@@ -376,15 +376,24 @@ class GameScorer
 
     enemies = @game.enemies.select(&:alive?)
 
+    distance_to_food = @bfs.distance_to_food[player] || @game.board.width * 2
+    if distance_to_food > 10
+      distance_to_food /= 100.0
+      distance_to_food += 10
+    end
+
+    # Make it urgent if we are near death
+    distance_to_food *= 10 if player.health < 20
+
     [
-        25 * player.length,
+        50 * player.length,
          1 * player.health,
-      -100 * enemies.count,
+      -250 * enemies.count,
         -1 * (enemies.map(&:length).max || 0),
         -1 * enemies.sum(&:length),
 
          1 * @bfs.voronoi_tiles[player],
-        -1 * (@bfs.distance_to_food[player] || @game.board.width),
+        -1 * distance_to_food
     ].sum
   end
 end
