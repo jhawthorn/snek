@@ -259,14 +259,18 @@ class Game
       snake.health -= 1
     end
 
+    eaten_food = []
     snakes.each do |snake|
       if board.food.include?(snake.head)
-        board.food.delete(snake.head)
+        eaten_food << snake.head
       elsif actions[snake.id]
         snake.body.pop
       else
         # We didn't simulate a move
       end
+    end
+    eaten_food.each do |food|
+      board.food.delete(food)
     end
 
     heads = snakes.group_by(&:head)
