@@ -102,4 +102,12 @@ class WebTest < MiniTest::Test
 {"game":{"id":"1550135655128486549"},"turn":1,"board":{"height":10,"width":10,"food":[{"x":1,"y":1}],"snakes":[{"id":"you","name":"you","health":0,"body":[{"x":2,"y":2}]}]},"you":{"id":"you","name":"you","health":0,"body":[{"x":2,"y":2}]}}
     JSON
   end
+
+  def test_4_player_fixture
+    assert_success_from_payload File.read("#{__dir__}/fixtures/4_player_large_game.json")
+  end
+
+  def test_8_player_fixture
+    assert_success_from_payload File.read("#{__dir__}/fixtures/4_player_large_game.json")
+  end
 end

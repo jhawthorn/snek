@@ -412,10 +412,20 @@ class MoveDecider
     end
   end
 
+  def considered_snakes
+    return @snakes if @snakes.count <= 4
+
+    player = @game.player
+
+    @snakes.sort_by do |snake|
+      (snake.head.x - player.head.x).abs + (snake.head.y - player.head.y).abs
+    end.first(4)
+  end
+
   def reasonable_moves
     @reasonable_moves ||=
       Hash[
-        @snakes.map do |snake|
+        considered_snakes.map do |snake|
           moves = ACTIONS.reject do |move|
             head = snake.head
             new_head = head.move(move)
