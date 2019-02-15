@@ -3,7 +3,6 @@ require "test_helper"
 require File.expand_path("../web", __dir__)
 
 class WebTest < MiniTest::Test
-
   include Rack::Test::Methods
 
   def app
@@ -18,7 +17,7 @@ class WebTest < MiniTest::Test
   def test_start
     post '/start'
     assert last_response.ok?
-    assert_equal %q({"color":"#fff000"}), last_response.body
+    assert_equal %q({"color":"#24292e"}), last_response.body
   end
 
   def test_end
