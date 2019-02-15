@@ -48,6 +48,10 @@ class Point
     x == other.x && y == other.y
   end
 
+  def eql?(other)
+    x == other.x && y == other.y
+  end
+
   def hash
     [x, y].hash
   end
