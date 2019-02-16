@@ -308,14 +308,13 @@ class Game
 end
 
 class BoardBFS
-  attr_reader :game, :board
+  attr_reader :board
 
   attr_reader :voronoi_tiles
   attr_reader :distance_to_food
 
-  def initialize(game)
-    @game = game
-    @board = game.board
+  def initialize(board)
+    @board = board
     @snakes = board.snakes.select(&:alive?)
 
     @voronoi_tiles = Hash.new(0).compare_by_identity
@@ -385,7 +384,7 @@ end
 class GameScorer
   def initialize(game, bfs: nil)
     @game = game
-    @bfs = bfs || BoardBFS.new(@game)
+    @bfs = bfs || BoardBFS.new(@game.board)
   end
 
   def score
