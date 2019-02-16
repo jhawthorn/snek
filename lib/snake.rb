@@ -15,6 +15,7 @@ end
 ACTIONS = [:up, :down, :left, :right]
 
 SCORE_MIN = -999999999
+SCORE_MAX =  999999999
 
 class Point
   attr_reader :x, :y
@@ -394,7 +395,17 @@ class GameScorer
     player = @game.player
     return SCORE_MIN unless player.alive?
 
-    enemies = @game.enemies.select(&:alive?)
+    # If there was at least one enemy, but now is dead, victory
+    # Necessary so we still somewhat play a single player game
+    if @game.enemies.any? && @game.enemies.none?(&:alive?)
+      return SCORE_MAX
+    end
+
+    # If we're 100% backed into a corner
+    # This basically saves us one turn of simulation
+    if @bfs.voronoi_tiles[player] == 0
+      return SCORE_MIN + 10
+    end
 
     distance_to_food = @bfs.distance_to_food[player] || @game.board.width * 2
     if distance_to_food > 10
@@ -404,6 +415,8 @@ class GameScorer
 
     # Make it urgent if we are near death
     distance_to_food *= 10 if player.health < 20
+
+    enemies = @game.enemies.select(&:alive?)
 
     [
         50 * player.length,
