@@ -106,14 +106,6 @@ class Snake
     @health = 0
   end
 
-  def simulate!(action, game)
-    point = head.move(action)
-
-    @body.unshift(point)
-
-    self
-  end
-
   def hash
     @id.hash
   end
@@ -214,7 +206,8 @@ class Board
       action = actions[snake.id]
       next unless action
 
-      snake.simulate!(action, self)
+      new_head = snake.head.move(action)
+      snake.body.unshift(new_head)
     end
 
     snakes.each do |snake|
