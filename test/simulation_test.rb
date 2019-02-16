@@ -6,7 +6,7 @@ class SimulationTest < MiniTest::Test
       Snake.new(body: [Point.new(5,1), Point.new(4,1)]),
       Snake.new(body: [Point.new(6,1), Point.new(7,1)])
     ]
-    board = Board.new(snakes: snakes, width: 10)
+    board = Board.new(snakes: snakes)
 
     board.simulate!(
       snakes[0].id => :up,
@@ -22,7 +22,7 @@ class SimulationTest < MiniTest::Test
       Snake.new(body: [Point.new(5,0), Point.new(4,0)]),
       Snake.new(body: [Point.new(6,0), Point.new(7,0)])
     ]
-    board = Board.new(snakes: snakes, width: 10)
+    board = Board.new(snakes: snakes)
 
     board.simulate!(
       snakes[0].id => :up,
@@ -38,7 +38,7 @@ class SimulationTest < MiniTest::Test
       Snake.new(body: [Point.new(4,1), Point.new(3,1)]),
       Snake.new(body: [Point.new(6,1), Point.new(7,1)])
     ]
-    board = Board.new(snakes: snakes, width: 10)
+    board = Board.new(snakes: snakes)
 
     board.simulate!(
       snakes[0].id => :right,
@@ -54,7 +54,7 @@ class SimulationTest < MiniTest::Test
       Snake.new(body: [Point.new(4,1), Point.new(3,1)]),
       Snake.new(body: [Point.new(6,1), Point.new(7,1), Point.new(8,1)])
     ]
-    board = Board.new(snakes: snakes, width: 10)
+    board = Board.new(snakes: snakes)
 
     board.simulate!(
       snakes[0].id => :right,
@@ -67,7 +67,7 @@ class SimulationTest < MiniTest::Test
 
   def test_can_move_into_own_tain
     snake = Snake.new(body: [Point.new(4,1), Point.new(3,1), Point.new(3,2), Point.new(4,2)])
-    board = Board.new(snakes: [snake], width: 10)
+    board = Board.new(snakes: [snake])
 
     board.simulate!(snake.id => :down)
 
@@ -77,7 +77,7 @@ class SimulationTest < MiniTest::Test
   # Apparently this will be the new rule
   def test_cant_move_into_own_tain_if_just_grown
     snake = Snake.new(body: [Point.new(4,1), Point.new(3,1), Point.new(3,2), Point.new(4,2), Point.new(4,2)])
-    board = Board.new(snakes: [snake], width: 10)
+    board = Board.new(snakes: [snake])
     game = Game.new(self_id: snake.id, board: board)
 
     board.simulate!(snake.id => :down)

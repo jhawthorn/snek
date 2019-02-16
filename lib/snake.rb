@@ -172,7 +172,7 @@ end
 class Board
   attr_reader :snakes, :width, :height, :food
 
-  def initialize(width:, height: width, snakes: [], food: [])
+  def initialize(width: 11, height: width, snakes: [], food: [])
     @width = width
     @height = height
     @snakes = snakes
