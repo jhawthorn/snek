@@ -336,7 +336,9 @@ class BoardBFS
 
     food.set_all(board.food, true)
 
-    @game.snakes.each do |snake|
+    @game.snakes.sort_by do |snake|
+      -snake.length
+    end.each do |snake|
       unless board.out_of_bounds?(snake.head)
         next_queue << [snake.head.x, snake.head.y, snake]
       end
