@@ -318,6 +318,7 @@ class BoardBFS
   def initialize(game)
     @game = game
     @board = game.board
+    @snakes = board.snakes.select(&:alive?)
 
     @voronoi_tiles = Hash.new(0).compare_by_identity
     @distance_to_food = {}.compare_by_identity
@@ -336,7 +337,7 @@ class BoardBFS
 
     food.set_all(board.food, true)
 
-    snakes = @game.snakes.sort_by do |snake|
+    snakes = @snakes.sort_by do |snake|
       -snake.length
     end
 
