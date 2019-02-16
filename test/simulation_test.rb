@@ -68,4 +68,25 @@ class SimulationTest < MiniTest::Test
     refute_predicate snakes[0], :alive?
     assert_predicate snakes[1], :alive?
   end
+
+  def test_can_move_into_own_tain
+    snake = Snake.new(body: [Point.new(4,1), Point.new(3,1), Point.new(3,2), Point.new(4,2)])
+    board = Board.new(snakes: [snake], width: 10)
+    game = Game.new(self_id: snake.id, board: board)
+
+    game.simulate!(snake.id => :down)
+
+    assert_predicate snake, :alive?
+  end
+
+  # Apparently this will be the new rule
+  def test_cant_move_into_own_tain_if_just_grown
+    snake = Snake.new(body: [Point.new(4,1), Point.new(3,1), Point.new(3,2), Point.new(4,2), Point.new(4,2)])
+    board = Board.new(snakes: [snake], width: 10)
+    game = Game.new(self_id: snake.id, board: board)
+
+    game.simulate!(snake.id => :down)
+
+    refute_predicate snake, :alive?
+  end
 end
