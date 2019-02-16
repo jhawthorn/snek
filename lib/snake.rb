@@ -336,9 +336,11 @@ class BoardBFS
 
     food.set_all(board.food, true)
 
-    @game.snakes.sort_by do |snake|
+    snakes = @game.snakes.sort_by do |snake|
       -snake.length
-    end.each do |snake|
+    end
+
+    snakes.each do |snake|
       unless board.out_of_bounds?(snake.head)
         next_queue << [snake.head.x, snake.head.y, snake]
       end
@@ -367,6 +369,13 @@ class BoardBFS
         next_queue << [x-1, y, snake] if x > 0
         next_queue << [x, y+1, snake] if y < height_1
         next_queue << [x, y-1, snake] if y > 0
+      end
+
+      snakes.reverse_each do |snake|
+        break if snake.length < distance
+        next if snake.length < distance-1 && snake.body[-distance] == snake.body[-distance-1]
+
+        visited.set(snake.body[-distance], false)
       end
 
       distance += 1
