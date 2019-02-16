@@ -206,6 +206,65 @@ class Board
     end
     x < 0 || y < 0 || x >= @width || y >= @height
   end
+
+  def simulate!(actions)
+    snakes = @snakes.select(&:alive?)
+
+    snakes.each do |snake|
+      action = actions[snake.id]
+      next unless action
+
+      snake.simulate!(action, self)
+    end
+
+    snakes.each do |snake|
+      snake.health -= 1
+    end
+
+    eaten_food = []
+    snakes.each do |snake|
+      if @food.include?(snake.head)
+        eaten_food << snake.head
+      elsif actions[snake.id]
+        snake.body.pop
+      else
+        # We didn't simulate a move
+      end
+    end
+    eaten_food.each do |food|
+      @food.delete(food)
+    end
+
+    heads = snakes.group_by(&:head)
+    walls = Grid.new(width, height)
+    snakes.each do |snake|
+      walls.set_all(snake.tail, true)
+    end
+
+    snakes.each do |snake|
+      if out_of_bounds?(snake.head)
+        snake.die!
+        next
+      end
+
+      if walls.get(snake.head)
+        snake.die!
+        next
+      end
+
+      lost_collision =
+        heads[snake.head].any? do |other|
+          next if other.equal?(snake)
+
+          other.length >= snake.length
+        end
+
+      if lost_collision
+        snake.die!
+        next
+      end
+    end
+  end
 end
 
 class Game
@@ -251,62 +310,7 @@ class Game
   end
 
   def simulate!(actions)
-    snakes = board.snakes.select(&:alive?)
-
-    snakes.each do |snake|
-      action = actions[snake.id]
-      next unless action
-
-      snake.simulate!(action, self)
-    end
-
-    snakes.each do |snake|
-      snake.health -= 1
-    end
-
-    eaten_food = []
-    snakes.each do |snake|
-      if board.food.include?(snake.head)
-        eaten_food << snake.head
-      elsif actions[snake.id]
-        snake.body.pop
-      else
-        # We didn't simulate a move
-      end
-    end
-    eaten_food.each do |food|
-      board.food.delete(food)
-    end
-
-    heads = snakes.group_by(&:head)
-    walls = Grid.new(board.width, board.height)
-    snakes.each do |snake|
-      walls.set_all(snake.tail, true)
-    end
-
-    snakes.each do |snake|
-      if board.out_of_bounds?(snake.head)
-        snake.die!
-        next
-      end
-
-      if walls.get(snake.head)
-        snake.die!
-        next
-      end
-
-      lost_collision =
-        heads[snake.head].any? do |other|
-          next if other.equal?(snake)
-
-          other.length >= snake.length
-        end
-
-      if lost_collision
-        snake.die!
-        next
-      end
-    end
+    board.simulate!(actions)
   end
 end
 

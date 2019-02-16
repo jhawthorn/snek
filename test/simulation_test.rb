@@ -7,9 +7,8 @@ class SimulationTest < MiniTest::Test
       Snake.new(body: [Point.new(6,1), Point.new(7,1)])
     ]
     board = Board.new(snakes: snakes, width: 10)
-    game = Game.new(self_id: snakes[0].id, board: board)
 
-    game.simulate!(
+    board.simulate!(
       snakes[0].id => :up,
       snakes[1].id => :down
     )
@@ -24,9 +23,8 @@ class SimulationTest < MiniTest::Test
       Snake.new(body: [Point.new(6,0), Point.new(7,0)])
     ]
     board = Board.new(snakes: snakes, width: 10)
-    game = Game.new(self_id: snakes[0].id, board: board)
 
-    game.simulate!(
+    board.simulate!(
       snakes[0].id => :up,
       snakes[1].id => :down
     )
@@ -41,9 +39,8 @@ class SimulationTest < MiniTest::Test
       Snake.new(body: [Point.new(6,1), Point.new(7,1)])
     ]
     board = Board.new(snakes: snakes, width: 10)
-    game = Game.new(self_id: snakes[0].id, board: board)
 
-    game.simulate!(
+    board.simulate!(
       snakes[0].id => :right,
       snakes[1].id => :left
     )
@@ -58,9 +55,8 @@ class SimulationTest < MiniTest::Test
       Snake.new(body: [Point.new(6,1), Point.new(7,1), Point.new(8,1)])
     ]
     board = Board.new(snakes: snakes, width: 10)
-    game = Game.new(self_id: snakes[0].id, board: board)
 
-    game.simulate!(
+    board.simulate!(
       snakes[0].id => :right,
       snakes[1].id => :left
     )
@@ -72,9 +68,8 @@ class SimulationTest < MiniTest::Test
   def test_can_move_into_own_tain
     snake = Snake.new(body: [Point.new(4,1), Point.new(3,1), Point.new(3,2), Point.new(4,2)])
     board = Board.new(snakes: [snake], width: 10)
-    game = Game.new(self_id: snake.id, board: board)
 
-    game.simulate!(snake.id => :down)
+    board.simulate!(snake.id => :down)
 
     assert_predicate snake, :alive?
   end
@@ -85,7 +80,7 @@ class SimulationTest < MiniTest::Test
     board = Board.new(snakes: [snake], width: 10)
     game = Game.new(self_id: snake.id, board: board)
 
-    game.simulate!(snake.id => :down)
+    board.simulate!(snake.id => :down)
 
     refute_predicate snake, :alive?
   end
