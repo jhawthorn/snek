@@ -286,12 +286,12 @@ class Game
     snakes.each do |snake|
       if board.out_of_bounds?(snake.head)
         snake.die!
-        break
+        next
       end
 
       if walls.get(snake.head)
         snake.die!
-        break
+        next
       end
 
       lost_collision =
@@ -303,7 +303,7 @@ class Game
 
       if lost_collision
         snake.die!
-        break
+        next
       end
     end
   end
