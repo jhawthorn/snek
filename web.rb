@@ -17,7 +17,7 @@ end
 
 post '/move' do
   requestBody = request.body.read
-  puts requestBody
+  logger.info requestBody
   requestJson = requestBody ? JSON.parse(requestBody) : {}
 
   game = Game.from_json(requestJson)
