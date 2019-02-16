@@ -44,6 +44,14 @@ class WebTest < MiniTest::Test
 
     # That's all it is
     assert_equal({ "move" => move }, json)
+
+    move
+  end
+
+  def assert_move_from_payload(expected, payload)
+    move = assert_success_from_payload(payload)
+
+    assert_equal expected.to_sym, move.to_sym
   end
 
   def test_example_move
@@ -108,5 +116,11 @@ class WebTest < MiniTest::Test
 
   def test_8_player_fixture
     assert_success_from_payload File.read("#{__dir__}/fixtures/4_player_large_game.json")
+  end
+
+  def test_dont_cause_head_on_tie
+    assert_move_from_payload :up, <<-JSON
+    {"game":{"id":"a249aa6f-20f7-426c-a5a3-68e7447805df"},"turn":50,"board":{"height":15,"width":15,"food":[{"x":1,"y":13},{"x":5,"y":2},{"x":12,"y":1},{"x":3,"y":1},{"x":10,"y":0},{"x":2,"y":3},{"x":0,"y":14},{"x":11,"y":0},{"x":1,"y":7},{"x":6,"y":11}],"snakes":[{"id":"3e123a3e-ea7b-4fe6-8c08-6a328112c27e","name":"snek","health":98,"body":[{"x":5,"y":6},{"x":5,"y":5},{"x":4,"y":5},{"x":4,"y":6},{"x":4,"y":7},{"x":5,"y":7},{"x":6,"y":7}]},{"id":"ede45648-5e24-4134-9305-b6ba6f955b8d","name":"snek","health":86,"body":[{"x":6,"y":5},{"x":7,"y":5},{"x":7,"y":4},{"x":8,"y":4},{"x":8,"y":5},{"x":8,"y":6},{"x":8,"y":7}]}]},"you":{"id":"ede45648-5e24-4134-9305-b6ba6f955b8d","name":"snek","health":86,"body":[{"x":6,"y":5},{"x":7,"y":5},{"x":7,"y":4},{"x":8,"y":4},{"x":8,"y":5},{"x":8,"y":6},{"x":8,"y":7}]}}
+    JSON
   end
 end
