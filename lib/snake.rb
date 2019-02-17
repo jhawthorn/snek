@@ -369,14 +369,14 @@ class BoardBFS
         next_queue << [x, y-1, snake] if y > 0
       end
 
+      distance += 1
+
       snakes.reverse_each do |snake|
         break if snake.length < distance
         next if snake.length < distance-1 && snake.body[-distance] == snake.body[-distance-1]
 
         visited.set(snake.body[-distance], false)
       end
-
-      distance += 1
     end
   end
 end
