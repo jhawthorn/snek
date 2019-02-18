@@ -93,5 +93,22 @@ class SimulationTest < MiniTest::Test
 
     assert_predicate snake, :alive?
     assert_equal [Point.new(4,2), Point.new(4,1), Point.new(3,1), Point.new(3,1)], snake.body
+    assert_equal [], board.food
+  end
+
+  def test_crash_into_food
+    snakes = [
+      Snake.new(body: [Point.new(4,1), Point.new(3,1)]),
+      Snake.new(body: [Point.new(6,1), Point.new(7,1)])
+    ]
+    board = Board.new(snakes: snakes, food: [Point.new(5,1)])
+
+    board.simulate!(
+      snakes[0].id => :right,
+      snakes[1].id => :left
+    )
+
+    refute_predicate snakes[0], :alive?
+    refute_predicate snakes[1], :alive?
   end
 end
