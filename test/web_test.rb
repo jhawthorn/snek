@@ -17,7 +17,7 @@ class WebTest < MiniTest::Test
   def test_start
     post '/start'
     assert last_response.ok?
-    assert_equal %q({"color":"#24292e"}), last_response.body
+    assert_equal %q({"color":"#24292e","headType":"silly","tailType":"block-bum"}), last_response.body
   end
 
   def test_end

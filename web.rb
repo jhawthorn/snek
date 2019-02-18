@@ -5,6 +5,8 @@ $LOAD_PATH.unshift "#{__dir__}/lib"
 require "snake"
 
 COLOUR = "#24292e"
+HEAD_TYPE = "silly"
+TAIL_TYPE = "block-bum"
 
 get '/' do
   'Battlesnake documentation can be found at' \
@@ -12,7 +14,7 @@ get '/' do
 end
 
 post '/start' do
-  json(color: COLOUR)
+  json(color: COLOUR, headType: HEAD_TYPE, tailType: TAIL_TYPE)
 end
 
 post '/move' do
