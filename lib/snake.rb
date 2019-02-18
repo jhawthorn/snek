@@ -437,7 +437,7 @@ class MoveDecider
     @walls = board.new_grid
     @snakes = @game.snakes.select(&:alive?)
     @snakes.each do |snake|
-      @walls.set_all(snake.body, true)
+      @walls.set_all(snake.body[0...-1], true)
     end
   end
 
