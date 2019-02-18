@@ -72,6 +72,7 @@ class SimulationTest < MiniTest::Test
     board.simulate!(snake.id => :down)
 
     assert_predicate snake, :alive?
+    assert_equal [Point.new(4,2), Point.new(4,1), Point.new(3,1), Point.new(3,2)], snake.body
   end
 
   # Apparently this will be the new rule
@@ -82,5 +83,15 @@ class SimulationTest < MiniTest::Test
     board.simulate!(snake.id => :down)
 
     refute_predicate snake, :alive?
+  end
+
+  def test_eats_food
+    snake = Snake.new(body: [Point.new(4,1), Point.new(3,1), Point.new(2,1)])
+    board = Board.new(snakes: [snake], food: [Point.new(4,2)])
+
+    board.simulate!(snake.id => :down)
+
+    assert_predicate snake, :alive?
+    assert_equal [Point.new(4,2), Point.new(4,1), Point.new(3,1), Point.new(2,1)], snake.body
   end
 end
