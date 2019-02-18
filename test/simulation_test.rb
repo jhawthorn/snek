@@ -92,6 +92,6 @@ class SimulationTest < MiniTest::Test
     board.simulate!(snake.id => :down)
 
     assert_predicate snake, :alive?
-    assert_equal [Point.new(4,2), Point.new(4,1), Point.new(3,1), Point.new(2,1)], snake.body
+    assert_equal [Point.new(4,2), Point.new(4,1), Point.new(3,1), Point.new(3,1)], snake.body
   end
 end

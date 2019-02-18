@@ -214,14 +214,15 @@ class Board
       snake.health -= 1
     end
 
+    snakes.each do |snake|
+      snake.body.pop
+    end
+
     eaten_food = []
     snakes.each do |snake|
       if @food.include?(snake.head)
         eaten_food << snake.head
-      elsif actions[snake.id]
-        snake.body.pop
-      else
-        # We didn't simulate a move
+        snake.body << snake.body.last
       end
     end
     eaten_food.each do |food|
