@@ -6,3 +6,8 @@ require 'minitest/autorun'
 require 'rack/test'
 
 require 'snake'
+
+module SnakeTestHelpers
+end
+
+MiniTest::Test.include SnakeTestHelpers
