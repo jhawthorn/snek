@@ -36,4 +36,44 @@ class DecisionTest < MiniTest::Test
 
     assert_equal :right, move
   end
+
+  def test_will_eat
+    snake = Snake.new(body: [Point.new(5,5), Point.new(5,4), Point.new(5,3)])
+    board = Board.new(snakes: [snake], food: [Point.new(5,6)])
+    game = Game.new(board: board, self_id: snake.id)
+
+    move =  MoveDecider.new(game).next_move
+
+    assert_equal :down, move
+  end
+
+  def test_will_eat_mostly_surrounded
+    snake = Snake.new(body: [Point.new(7,4), Point.new(7,5), Point.new(6,5), Point.new(5,5), Point.new(5,4), Point.new(5,3)])
+    board = Board.new(snakes: [snake], food: [Point.new(6,4)])
+    game = Game.new(board: board, self_id: snake.id)
+
+    move =  MoveDecider.new(game).next_move
+
+    assert_equal :left, move
+  end
+
+  def test_wont_eat_fully_surrounded
+    snake = Snake.new(body: [Point.new(6,3), Point.new(7,3), Point.new(7,4), Point.new(7,5), Point.new(6,5), Point.new(5,5), Point.new(5,4), Point.new(5,3)])
+    board = Board.new(snakes: [snake], food: [Point.new(6,4)])
+    game = Game.new(board: board, self_id: snake.id)
+
+    move =  MoveDecider.new(game).next_move
+    p  MoveDecider.new(game).move_scores
+
+    puts board
+
+    game.simulate!(snake.id => move)
+
+    puts board
+
+    move =  MoveDecider.new(game).move_scores
+
+
+    assert_equal :down, move
+  end
 end

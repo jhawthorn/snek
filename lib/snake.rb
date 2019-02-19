@@ -118,10 +118,10 @@ end
 class Grid
   attr_reader :width, :height
 
-  def initialize(width, height)
+  def initialize(width, height, default: nil)
     @width = width
     @height = height
-    @grid = Array.new(width * height)
+    @grid = Array.new(width * height, default)
   end
 
   def get(x, y=nil)
@@ -159,6 +159,13 @@ class Grid
     values.map! { |v| v.ljust(hsize) }
     "#<Grid #{@width}x#{@height}\n" + values.each_slice(@width).map(&:join).join("\n") + "\n>"
   end
+
+  def to_s(padding: 1, method: :to_s)
+    values = @grid.map(&method)
+    hsize = values.map(&:size).max + padding
+    values.map! { |v| v.ljust(hsize) }
+    values.each_slice(@width).map(&:join).join("\n")
+  end
 end
 
 class Board
@@ -187,8 +194,8 @@ class Board
     @food = @food.map(&:dup)
   end
 
-  def new_grid
-    Grid.new(@width, @height)
+  def new_grid(default: nil)
+    Grid.new(@width, @height, default: default)
   end
 
   def out_of_bounds?(x, y=nil)
@@ -258,6 +265,23 @@ class Board
         next
       end
     end
+  end
+
+  def to_s
+    grid = new_grid(default: ' ')
+
+    letters = (?a..?z).to_a
+    @snakes.select(&:alive?).each do |snake|
+      letter = letters.shift
+      grid.set(snake.head, letter.upcase)
+      grid.set_all(snake.tail, letter)
+    end
+    grid.set_all(food, '*')
+    grid.to_s(padding: 0)
+  end
+
+  def inspect
+    "#<Board\n#{to_s}\n>"
   end
 end
 
@@ -383,6 +407,8 @@ class BoardBFS
 end
 
 class GameScorer
+  attr_reader :bfs
+
   def initialize(game, bfs: nil)
     @game = game
     @bfs = bfs || BoardBFS.new(@game.board)
@@ -400,7 +426,7 @@ class GameScorer
 
     # If we're 100% backed into a corner
     # This basically saves us one turn of simulation
-    if @bfs.voronoi_tiles[player] == 0
+    if @bfs.voronoi_tiles[player] <= 1
       return SCORE_MIN + 10
     end
 
@@ -468,9 +494,9 @@ class MoveDecider
       ]
   end
 
-  def next_move
+  def move_scores
     # I don't know why the game server asks us this...
-    return ACTIONS.sample if @snakes.none?
+    return [ACTIONS.sample] if @snakes.none?
 
     possibilities = all_move_combinations.to_a
 
@@ -483,15 +509,20 @@ class MoveDecider
     end
 
     player_id = @game.player.id
-    reasonable_moves[player_id].max_by do |action|
+    reasonable_moves[player_id].map do |action|
       relevant =
         possibilities.select do |(possibility, _)|
           possibility[player_id] == action
         end
 
-      relevant.map(&:last).min
+      [action, relevant.map(&:last).min]
     end
   end
+
+  def next_move
+    move_scores.max_by(&:last).first
+  end
+
 
   def all_move_combinations(possible_moves = reasonable_moves)
     return enum_for(__method__, possible_moves) unless block_given?
