@@ -489,6 +489,8 @@ class MoveDecider
             board.out_of_bounds?(new_head) || @walls.get(new_head)
           end
 
+          moves << ACTIONS.sample if moves.empty?
+
           [snake.id, moves]
         end
       ]
