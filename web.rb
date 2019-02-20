@@ -4,7 +4,7 @@ require "sinatra/json"
 $LOAD_PATH.unshift "#{__dir__}/lib"
 require "snake"
 
-COLOUR = "#cdffd8"
+COLOUR = "#6aec87"
 HEAD_TYPE = "silly"
 TAIL_TYPE = "bolt"
 
