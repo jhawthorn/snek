@@ -394,14 +394,16 @@ class BoardBFS
         next_queue << [x, y-1, snake] if y > 0
       end
 
-      distance += 1
-
       snakes.reverse_each do |snake|
+        break if distance == 0
         break if snake.length < distance
         next if snake.length < distance-1 && snake.body[-distance] == snake.body[-distance-1]
+        next if @distance_to_food[snake]
 
         visited.set(snake.body[-distance], false)
       end
+
+      distance += 1
     end
   end
 end
@@ -498,7 +500,7 @@ class MoveDecider
 
   def move_scores
     # I don't know why the game server asks us this...
-    return [ACTIONS.sample] if @snakes.none?
+    return [[ACTIONS.sample, 0]] if @snakes.none?
 
     possibilities = all_move_combinations.to_a
 
@@ -524,7 +526,6 @@ class MoveDecider
   def next_move
     move_scores.max_by(&:last).first
   end
-
 
   def all_move_combinations(possible_moves = reasonable_moves)
     return enum_for(__method__, possible_moves) unless block_given?

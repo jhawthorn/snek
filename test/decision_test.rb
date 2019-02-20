@@ -47,6 +47,20 @@ class DecisionTest < MiniTest::Test
     assert_equal :down, move
   end
 
+  def test_still_take_action_if_opponent_screwed
+    snakes = [
+      Snake.new(body: [Point.new(5,5), Point.new(5,6), Point.new(5,7)]),
+      Snake.new(body: [Point.new(0,0), Point.new(0,1), Point.new(1,1), Point.new(1,0), Point.new(2,0)])
+    ]
+    board = Board.new(snakes: snakes, food: [Point.new(5,6)])
+
+    game = Game.new(board: board, self_id: snakes[0].id)
+
+    move =  MoveDecider.new(game).next_move
+
+    assert_includes ACTIONS, move
+  end
+
   def test_will_eat_mostly_surrounded
     snake = Snake.new(body: [Point.new(7,4), Point.new(7,5), Point.new(6,5), Point.new(5,5), Point.new(5,4), Point.new(5,3)])
     board = Board.new(snakes: [snake], food: [Point.new(6,4)])
@@ -63,17 +77,27 @@ class DecisionTest < MiniTest::Test
     game = Game.new(board: board, self_id: snake.id)
 
     move =  MoveDecider.new(game).next_move
-    p  MoveDecider.new(game).move_scores
 
-    puts board
+    refute_equal :down, move
+  end
 
-    game.simulate!(snake.id => move)
+  def test_wont_eat_doomed
+    snake = Snake.new(body: [Point.new(6,3), Point.new(7,3), Point.new(7,4), Point.new(7,5), Point.new(7,6), Point.new(6,6), Point.new(5,6), Point.new(5,5), Point.new(5,4), Point.new(5,3)])
+    board = Board.new(snakes: [snake], food: [Point.new(6,4)])
+    game = Game.new(board: board, self_id: snake.id)
 
-    puts board
+    move =  MoveDecider.new(game).next_move
 
-    move =  MoveDecider.new(game).move_scores
+    refute_equal :down, move
+  end
 
+  def test_wont_eat_also_doomed
+    snake = Snake.new(body: [Point.new(6,2), Point.new(7,2), Point.new(7,3), Point.new(7,4), Point.new(7,5), Point.new(7,6), Point.new(6,6), Point.new(5,6), Point.new(5,5), Point.new(5,4), Point.new(5,3)])
+    board = Board.new(snakes: [snake], food: [Point.new(6,4)])
+    game = Game.new(board: board, self_id: snake.id)
 
-    assert_equal :down, move
+    move =  MoveDecider.new(game).next_move
+
+    refute_equal :down, move
   end
 end
