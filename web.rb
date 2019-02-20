@@ -4,9 +4,9 @@ require "sinatra/json"
 $LOAD_PATH.unshift "#{__dir__}/lib"
 require "snake"
 
-COLOUR = "#24292e"
+COLOUR = "#cdffd8"
 HEAD_TYPE = "silly"
-TAIL_TYPE = "block-bum"
+TAIL_TYPE = "bolt"
 
 get '/' do
   'Battlesnake documentation can be found at' \
