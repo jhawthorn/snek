@@ -394,7 +394,7 @@ class BoardBFS
         next_queue << [x, y-1, snake] if y > 0
       end
 
-      snakes.reverse_each do |snake|
+      snakes.each do |snake|
         break if distance == 0
         break if snake.length < distance
         next if snake.length < distance-1 && snake.body[-distance] == snake.body[-distance-1]
