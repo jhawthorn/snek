@@ -1,17 +1,5 @@
 require "securerandom"
 
-unless [].respond_to?(:sum)
-  class Array
-    def sum(&block)
-      if block_given?
-        map(&block).inject(0, :+)
-      else
-        inject(0, :+)
-      end
-    end
-  end
-end
-
 ACTIONS = [:up, :down, :left, :right]
 
 SCORE_MIN = -999999999
