@@ -1,6 +1,6 @@
 require 'snake'
 
-class SnakeController < ApplicationController
+class SnakeController < ActionController::API
   COLOUR = "#6aec87"
   HEAD_TYPE = "silly"
   TAIL_TYPE = "bolt"
