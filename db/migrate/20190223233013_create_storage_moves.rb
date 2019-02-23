@@ -1,7 +1,7 @@
 class CreateStorageMoves < ActiveRecord::Migration[6.0]
   def change
     create_table :storage_moves do |t|
-      t.belongs_to :game, foreign_key: true
+      t.belongs_to :game
       t.integer :turn
       t.string :snake_version
       t.string :decision
