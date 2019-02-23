@@ -1,8 +1,6 @@
 require "test_helper"
 require "set"
 
-require File.expand_path("../web", __dir__)
-
 class PointTest < MiniTest::Test
   def test_from_json
     point = Point.from_json({'x' => 123, 'y' => 456})

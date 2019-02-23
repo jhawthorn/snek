@@ -1,42 +1,29 @@
-require "test_helper"
+require 'rails_helper'
 
-require File.expand_path("../web", __dir__)
-
-class WebTest < MiniTest::Test
-  include Rack::Test::Methods
-
-  def app
-    Sinatra::Application
-  end
-
-  def test_root
-    get '/'
-    assert last_response.ok?
-  end
-
+class SnakeTest < ActionDispatch::IntegrationTest
   def test_start
     post '/start'
-    assert last_response.ok?
-    assert_equal %q({"color":"#24292e","headType":"silly","tailType":"block-bum"}), last_response.body
+    assert_response :success
+    assert_equal %q({"color":"#6aec87","headType":"silly","tailType":"bolt"}), response.body
   end
 
   def test_end
     post '/end'
-    assert last_response.ok?
-    assert_equal %q({}), last_response.body
+    assert_response :success
   end
 
   def test_ping
     post '/start'
-    assert last_response.ok?
+    assert_response :success
   end
 
   def assert_success_from_payload(payload)
-    post '/move', payload
-    assert last_response.ok?, last_response.body
-    refute_predicate last_response.body, :empty?
+    payload = JSON.parse(payload) if payload.is_a?(String)
+    post '/move', params: payload, as: :json
+    assert_response :success
+    refute_predicate response.body, :empty?
 
-    json = JSON.parse(last_response.body)
+    json = response.parsed_body
 
     # It returns a valid move
     move = json['move']
@@ -111,11 +98,11 @@ class WebTest < MiniTest::Test
   end
 
   def test_4_player_fixture
-    assert_success_from_payload File.read("#{__dir__}/fixtures/4_player_large_game.json")
+    assert_success_from_payload File.read("#{Rails.root}/test/fixtures/4_player_large_game.json")
   end
 
   def test_8_player_fixture
-    assert_success_from_payload File.read("#{__dir__}/fixtures/4_player_large_game.json")
+    assert_success_from_payload File.read("#{Rails.root}/test/fixtures/4_player_large_game.json")
   end
 
   def test_dont_cause_head_on_tie
