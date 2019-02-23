@@ -13,7 +13,7 @@ class SnakeTest < ActionDispatch::IntegrationTest
   end
 
   def test_ping
-    post '/start'
+    post '/ping'
     assert_response :success
   end
 
