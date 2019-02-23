@@ -13,13 +13,19 @@ action "Build docker container" {
   args = "build -t jhawthorn/gitadder ."
 }
 
+action "Filter Branch" {
+  uses = "actions/bin/filter@master"
+  needs = ["Build docker container", "Docker Login"]
+  args = "branch master"
+}
+
 action "Push container" {
   uses = "docker://docker:stable"
-  needs = ["Build docker container", "Docker Login"]
+  needs = ["Filter Branch"]
   args = "push jhawthorn/gitadder"
 }
 
-action "GitHub Action for Azure" {
+action "Azure Login" {
   uses = "Azure/github-actions/login@master"
   needs = ["Push container"]
   secrets = ["AZURE_SERVICE_APP_ID", "AZURE_SERVICE_PASSWORD", "AZURE_SERVICE_TENANT"]
@@ -27,7 +33,7 @@ action "GitHub Action for Azure" {
 
 action "Restart Azure Container" {
   uses = "Azure/github-actions/cli@7e91de5a41b40f2db181215fbbeaf6a2155b9f38"
-  needs = ["GitHub Action for Azure"]
+  needs = ["Azure Login"]
   env = {
     AZURE_SCRIPT = "az webapp restart --name gitadder --resource-group gitadder"
   }
