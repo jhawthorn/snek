@@ -15,6 +15,7 @@ ActiveRecord::Schema.define(version: 2019_02_23_233013) do
   create_table "storage_games", force: :cascade do |t|
     t.string "external_id", null: false
     t.string "snake_version", null: false
+    t.text "initial_state", null: false
     t.boolean "victory"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false

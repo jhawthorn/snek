@@ -4,6 +4,8 @@ class CreateStorageGames < ActiveRecord::Migration[6.0]
       t.string :external_id, null: false
       t.string :snake_version, null: false
 
+      t.text :initial_state, null: false
+
       t.boolean :victory
 
       t.timestamps
