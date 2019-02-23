@@ -1,10 +1,5 @@
 require "securerandom"
 
-ACTIONS = [:up, :down, :left, :right]
-
-SCORE_MIN = -999999999
-SCORE_MAX =  999999999
-
 class Point
   attr_reader :x, :y
 
@@ -51,6 +46,8 @@ class Point
 end
 
 class Snake
+  ACTIONS = [:up, :down, :left, :right]
+
   attr_reader :id, :health, :body
   attr_writer :health
 
@@ -397,6 +394,9 @@ class BoardBFS
 end
 
 class GameScorer
+  SCORE_MIN = -999999999
+  SCORE_MAX =  999999999
+
   attr_reader :bfs
 
   def initialize(game, bfs: nil)
@@ -472,14 +472,14 @@ class MoveDecider
     @reasonable_moves ||=
       Hash[
         considered_snakes.map do |snake|
-          moves = ACTIONS.reject do |move|
+          moves = Snake::ACTIONS.reject do |move|
             head = snake.head
             new_head = head.move(move)
 
             board.out_of_bounds?(new_head) || @walls.get(new_head)
           end
 
-          moves << ACTIONS.sample if moves.empty?
+          moves << Snake::ACTIONS.sample if moves.empty?
 
           [snake.id, moves]
         end
@@ -488,7 +488,7 @@ class MoveDecider
 
   def move_scores
     # I don't know why the game server asks us this...
-    return [[ACTIONS.sample, 0]] if @snakes.none?
+    return [[Snake::ACTIONS.sample, 0]] if @snakes.none?
 
     possibilities = all_move_combinations.to_a
 

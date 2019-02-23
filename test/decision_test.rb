@@ -58,7 +58,7 @@ class DecisionTest < MiniTest::Test
 
     move =  MoveDecider.new(game).next_move
 
-    assert_includes ACTIONS, move
+    assert_includes Snake::ACTIONS, move
   end
 
   def test_will_eat_mostly_surrounded
