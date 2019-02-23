@@ -1,0 +1,126 @@
+require "test_helper"
+
+require File.expand_path("../web", __dir__)
+
+class WebTest < MiniTest::Test
+  include Rack::Test::Methods
+
+  def app
+    Sinatra::Application
+  end
+
+  def test_root
+    get '/'
+    assert last_response.ok?
+  end
+
+  def test_start
+    post '/start'
+    assert last_response.ok?
+    assert_equal %q({"color":"#24292e","headType":"silly","tailType":"block-bum"}), last_response.body
+  end
+
+  def test_end
+    post '/end'
+    assert last_response.ok?
+    assert_equal %q({}), last_response.body
+  end
+
+  def test_ping
+    post '/start'
+    assert last_response.ok?
+  end
+
+  def assert_success_from_payload(payload)
+    post '/move', payload
+    assert last_response.ok?, last_response.body
+    refute_predicate last_response.body, :empty?
+
+    json = JSON.parse(last_response.body)
+
+    # It returns a valid move
+    move = json['move']
+    assert_includes %w[up down left right], move
+
+    # That's all it is
+    assert_equal({ "move" => move }, json)
+
+    move
+  end
+
+  def assert_move_from_payload(expected, payload)
+    move = assert_success_from_payload(payload)
+
+    assert_equal expected.to_sym, move.to_sym
+  end
+
+  def test_example_move
+    assert_success_from_payload <<~JSON
+{
+  "game": {
+    "id": "game-id-string"
+  },
+  "turn": 4,
+  "board": {
+    "height": 15,
+    "width": 15,
+    "food": [
+      {
+        "x": 1,
+        "y": 3
+      }
+    ],
+    "snakes": [
+      {
+        "id": "snake-id-string",
+        "name": "Sneky Snek",
+        "health": 90,
+        "body": [
+          {
+            "x": 1,
+            "y": 3
+          },
+          {
+            "x": 2,
+            "y": 3
+          }
+        ]
+      }
+    ]
+  },
+  "you": {
+    "id": "snake-id-string",
+    "name": "Sneky Snek",
+    "health": 90
+  }
+}
+  JSON
+
+  end
+
+  def test_move_from_play_battlesnake_io
+    assert_success_from_payload <<-JSON
+{"game":{"id":"684e74c2-68d6-4e58-a041-9d0c348161bb"},"turn":0,"board":{"height":11,"width":11,"food":[{"x":3,"y":7}],"snakes":[{"id":"gs_KGTDGScKhKSFYB8VPjm3pFJb","name":"snek","health":100,"body":[{"x":1,"y":1},{"x":1,"y":1},{"x":1,"y":1}]},{"id":"gs_tcbXTtDddv4dCVwgmq4r9T9d","name":"snek","health":100,"body":[{"x":9,"y":9},{"x":9,"y":9},{"x":9,"y":9}]}]},"you":{"id":"gs_tcbXTtDddv4dCVwgmq4r9T9d","name":"snek","health":100,"body":[{"x":9,"y":9},{"x":9,"y":9},{"x":9,"y":9}]}}
+    JSON
+  end
+
+  def test_regression_one_dead_snake
+    assert_success_from_payload <<-JSON
+{"game":{"id":"1550135655128486549"},"turn":1,"board":{"height":10,"width":10,"food":[{"x":1,"y":1}],"snakes":[{"id":"you","name":"you","health":0,"body":[{"x":2,"y":2}]}]},"you":{"id":"you","name":"you","health":0,"body":[{"x":2,"y":2}]}}
+    JSON
+  end
+
+  def test_4_player_fixture
+    assert_success_from_payload File.read("#{__dir__}/fixtures/4_player_large_game.json")
+  end
+
+  def test_8_player_fixture
+    assert_success_from_payload File.read("#{__dir__}/fixtures/4_player_large_game.json")
+  end
+
+  def test_dont_cause_head_on_tie
+    assert_move_from_payload :up, <<-JSON
+    {"game":{"id":"a249aa6f-20f7-426c-a5a3-68e7447805df"},"turn":50,"board":{"height":15,"width":15,"food":[{"x":1,"y":13},{"x":5,"y":2},{"x":12,"y":1},{"x":3,"y":1},{"x":10,"y":0},{"x":2,"y":3},{"x":0,"y":14},{"x":11,"y":0},{"x":1,"y":7},{"x":6,"y":11}],"snakes":[{"id":"3e123a3e-ea7b-4fe6-8c08-6a328112c27e","name":"snek","health":98,"body":[{"x":5,"y":6},{"x":5,"y":5},{"x":4,"y":5},{"x":4,"y":6},{"x":4,"y":7},{"x":5,"y":7},{"x":6,"y":7}]},{"id":"ede45648-5e24-4134-9305-b6ba6f955b8d","name":"snek","health":86,"body":[{"x":6,"y":5},{"x":7,"y":5},{"x":7,"y":4},{"x":8,"y":4},{"x":8,"y":5},{"x":8,"y":6},{"x":8,"y":7}]}]},"you":{"id":"ede45648-5e24-4134-9305-b6ba6f955b8d","name":"snek","health":86,"body":[{"x":6,"y":5},{"x":7,"y":5},{"x":7,"y":4},{"x":8,"y":4},{"x":8,"y":5},{"x":8,"y":6},{"x":8,"y":7}]}}
+    JSON
+  end
+end
