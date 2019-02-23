@@ -221,8 +221,5 @@ DEPENDENCIES
   web-console (>= 3.3.0)
   webpacker (>= 4.0.0.rc.3)
 
-RUBY VERSION
-   ruby 2.6.1p33
-
 BUNDLED WITH
    1.17.2
