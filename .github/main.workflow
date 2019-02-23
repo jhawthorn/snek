@@ -28,5 +28,7 @@ action "GitHub Action for Azure" {
 action "Restart Azure Container" {
   uses = "Azure/github-actions/cli@7e91de5a41b40f2db181215fbbeaf6a2155b9f38"
   needs = ["GitHub Action for Azure"]
-  args = "webapp restart --name gitadder --resource-group gitadder"
+  env = {
+    AZURE_SCRIPT = "az webapp restart --name gitadder --resource-group gitadder"
+  }
 }
