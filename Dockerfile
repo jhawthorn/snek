@@ -20,6 +20,7 @@ ENV \
 COPY Gemfile Gemfile.lock package.json yarn.lock ./
 RUN \
   gem install bundler && \
+  bundle config build.nokogiri --use-system-libraries && \
   bundle install --jobs 20 --retry 5 --without development:test && \
   yarn
 
