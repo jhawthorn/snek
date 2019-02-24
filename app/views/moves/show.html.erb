@@ -17,8 +17,8 @@
   </dd>
 </dl>
 
-<%= link_to "< prev", move_path(@move.prev) %>
-<%= link_to "next >", move_path(@move.next) %>
+<%= link_to "< prev", move_path(@move.prev) if @move.prev %>
+<%= link_to "next >", move_path(@move.next) if @move.next %>
 
 <table>
   <thead>
