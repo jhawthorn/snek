@@ -1,10 +1,9 @@
-<table class="game-table" style="width: 100%">
+<table class="table game-table" style="width: 100%">
   <thead>
     <tr>
       <th>id</th>
-      <th>turns</th>
+      <th>Result</th>
       <th>start time</th>
-      <th>end time</th>
       <th></th>
     </tr>
   </thead>
@@ -15,13 +14,10 @@
           <%= link_to game.external_id, game_path(game) %>
         </td>
         <td>
-          <%= game.moves.count %>
+          <%= game.human_result %>
         </td>
         <td>
           <%= l game.created_at %>
-        </td>
-        <td>
-          <%= l game.moves.last.created_at %>
         </td>
         <td>
           <%= link_to "show", game_path(game) %>

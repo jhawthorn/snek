@@ -5,6 +5,8 @@
   <dd><%= l @game.created_at %></dd>
   <dt>finished at</dt>
   <dd><%= l @game.moves.last.created_at %></dd>
+  <dt>Result</dt>
+  <dd><%= @game.human_result %></dd>
   <dt>Snake version</dt>
   <dd><%= version_link @game.snake_version %></dd>
 </dl>

@@ -5,6 +5,15 @@ class Storage::Game < ApplicationRecord
 
   validates :initial_state, :external_id, :snake_version, presence: true
 
+  def human_victory
+    { true => "won", false => "lost" }[victory]
+  end
+
+  def human_result
+    return if victory.nil?
+    "#{human_victory} in #{moves.count} turns"
+  end
+
   def external_url
     "https://play.battlesnake.io/g/#{external_id}/"
   end
