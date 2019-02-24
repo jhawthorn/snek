@@ -8,7 +8,7 @@ class SnakeTest < ActionDispatch::IntegrationTest
   end
 
   def test_end
-    post '/end'
+    post '/end', params: { game: { id: "game-id-string" } }, as: :json
     assert_response :success
   end
 
@@ -120,11 +120,18 @@ class SnakeTest < ActionDispatch::IntegrationTest
     game = Storage::Game.find_by!(external_id: "game-id-string")
     assert_equal start_payload, game.initial_state
     assert game.snake_version
+    assert_nil game.victory
 
     move_payload = JSON.parse(File.read("#{Rails.root}/test/fixtures/4_player_large_game.json"))
     post '/move', params: move_payload, as: :json
     assert_response :success
 
     assert_equal 1, game.moves.count
+
+    end_payload = { "game" => { "id" => "game-id-string" }, "board" => { 'snakes' => [], 'food' => [] }, 'you' => { 'id' => 'you' } }
+    post '/end', params: end_payload, as: :json
+    assert_response :success
+    game.reload
+    assert !game.victory
   end
 end

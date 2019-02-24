@@ -1,0 +1,43 @@
+ <dl>
+  <dt>id</dt>
+  <dd><%= @game.external_id %></dd>
+  <dt>started at</dt>
+  <dd><%= l @game.created_at %></dd>
+  <dt>finished at</dt>
+  <dd><%= l @game.moves.last.created_at %></dd>
+ </dl>
+
+<%= link_to(image_tag(@game.gif_url), @game.external_url) %>
+
+<table class="table moves-table">
+  <thead>
+    <tr>
+      <th>Turn</th>
+      <th>Choice</th>
+      <th>Runtime</th>
+      <th>Remaining snakes</th>
+      <th>Score</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @game.moves.each do |move| %>
+      <tr class="move">
+        <td>
+          <%= move.turn %>
+        </td>
+        <td>
+          <%= move.decision %>
+        </td>
+        <td>
+          <%= number_with_precision(move.runtime * 1000, precision: 1) %> ms
+        </td>
+        <td>
+          <%= move.remaining_snakes %>
+        </td>
+        <td>
+          <%= move.heuristic_score %>
+        </td>
+      </div>
+    <% end %>
+  </tbody>
+</table>

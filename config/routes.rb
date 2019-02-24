@@ -5,5 +5,7 @@ Rails.application.routes.draw do
   post '/end',   to: 'snake#end'
   post '/ping',  to: 'snake#ping'
 
+  resources :games
+
   root to: 'home#index'
 end

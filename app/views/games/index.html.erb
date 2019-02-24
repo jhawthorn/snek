@@ -1,0 +1,33 @@
+<table class="game-table" style="width: 100%">
+  <thead>
+    <tr>
+      <th>id</th>
+      <th>turns</th>
+      <th>start time</th>
+      <th>end time</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @games.each do |game| %>
+      <tr class="game">
+        <td>
+          <%= link_to game.external_id, game_path(game) %>
+        </td>
+        <td>
+          <%= game.moves.count %>
+        </td>
+        <td>
+          <%= l game.created_at %>
+        </td>
+        <td>
+          <%= l game.moves.last.created_at %>
+        </td>
+        <td>
+          <%= link_to "show", game_path(game) %>
+          <%= link_to "play.battlesnake.io", game.external_url %>
+        </td>
+      </div>
+    <% end %>
+  </tbody>
+</table>

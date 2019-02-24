@@ -45,6 +45,14 @@ class SnakeController < ActionController::API
   end
 
   def end
+    if storage_game = Storage::Game.find_by(external_id: request_json["game"]["id"])
+      game = Game.from_json(request_json)
+      if game.player
+        storage_game.update!(victory: true)
+      else
+        storage_game.update!(victory: false)
+      end
+    end
     render json: {}
   end
 
