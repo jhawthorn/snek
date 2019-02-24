@@ -40,28 +40,46 @@ class MoveDecider
       ]
   end
 
+  class Possibility
+    attr_reader :initial_game, :moves, :game, :scorer
+
+    def initialize(initial_game, moves)
+      @initial_game = initial_game
+      @moves = moves
+      @game = @initial_game.simulate(moves)
+      @scorer = GameScorer.new(@game)
+    end
+
+    def score
+      @score ||= @scorer.score
+    end
+
+    def player_move
+      @moves[@game.player.id]
+    end
+  end
+
+  def possible_futures
+    @possible_futures ||=
+      all_move_combinations.map do |moves|
+        Possibility.new(@game, moves)
+      end
+  end
+
   def move_scores
     # I don't know why the game server asks us this...
     return [[Snake::ACTIONS.sample, 0]] if @snakes.none?
 
-    possibilities = all_move_combinations.to_a
-
-    possibilities.map! do |moves|
-      game = @game.simulate(moves)
-
-      score = GameScorer.new(game).score
-
-      [moves, score]
-    end
+    possibilities = possible_futures
 
     player_id = @game.player.id
     reasonable_moves[player_id].map do |action|
       relevant =
-        possibilities.select do |(possibility, _)|
-          possibility[player_id] == action
+        possibilities.select do |possibility|
+          possibility.player_move == action
         end
 
-      [action, relevant.map(&:last).min]
+      [action, relevant.map(&:score).min]
     end
   end
 
