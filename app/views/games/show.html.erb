@@ -24,7 +24,7 @@
     </tr>
   </thead>
   <tbody>
-    <% @game.moves.each do |move| %>
+    <% @game.moves.order(turn: :asc).each do |move| %>
       <tr class="move">
         <td>
           <%= link_to move.turn, move_url(move) %>
