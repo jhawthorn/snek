@@ -46,3 +46,24 @@
     </tr>
   </tbody>
 <table>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th>Moves</th>
+      <th>Score</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @move.move_decider.possible_futures.each do |future| %>
+      <tr>
+        <td>
+          <%= content_tag :pre, future.moves_by_name.to_yaml.sub("---\n", "") %>
+        </td>
+        <td>
+          <%= future.score %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+<table>

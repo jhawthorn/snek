@@ -3,18 +3,20 @@ require 'securerandom'
 class Snake
   ACTIONS = [:up, :down, :left, :right]
 
-  attr_reader :id, :health, :body
+  attr_reader :id, :health, :body, :name
   attr_writer :health
 
-  def initialize(id: nil, health: 100, body: [])
+  def initialize(id: nil, health: 100, body: [], name: id)
     @id = id || SecureRandom.hex
     @health = health
+    @name = name
     @body = body
   end
 
   def self.from_json(data)
     new(
       id: data['id'],
+      name: data['name'],
       health: data['health'],
       body: data['body'].map { |p| Point.from_json(p) }
     )

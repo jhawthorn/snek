@@ -54,6 +54,11 @@ class MoveDecider
       @score ||= @scorer.score
     end
 
+    def moves_by_name
+      snakes = @game.snakes.index_by(&:id)
+      @moves.transform_keys { |key| snakes[key].name }
+    end
+
     def player_move
       @moves[@game.player.id]
     end

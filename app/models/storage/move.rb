@@ -7,8 +7,11 @@ class Storage::Move < ApplicationRecord
   validates :game_id, :turn, :snake_version, :decision, :state, :runtime, presence: true
 
   def heuristic_score
-    game = ::Game.from_json(state)
-    GameScorer.new(game).score
+    @score ||= GameScorer.new(simulated_game).score
+  end
+
+  def move_decider
+    @move_decider ||= MoveDecider.new(simulated_game)
   end
 
   def remaining_snakes
@@ -29,5 +32,9 @@ class Storage::Move < ApplicationRecord
 
   def next
     game.moves.find_by(turn: turn+1)
+  end
+
+  def simulated_game
+    @game ||= ::Game.from_json(state)
   end
 end
