@@ -4,6 +4,6 @@ class GamesController < ApplicationController
   end
 
   def show
-    @game = Storage::Game.find(params[:id])
+    @game = Storage::Game.find_by(external_id: params[:id])
   end
 end

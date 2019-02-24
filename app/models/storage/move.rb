@@ -14,4 +14,20 @@ class Storage::Move < ApplicationRecord
   def remaining_snakes
     state['board']['snakes'].count
   end
+
+  def before_image_url
+    game.turn_image_url(turn)
+  end
+
+  def after_image_url
+    game.turn_image_url(turn+1)
+  end
+
+  def prev
+    game.moves.find_by(turn: turn-1)
+  end
+
+  def next
+    game.moves.find_by(turn: turn+1)
+  end
 end

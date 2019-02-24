@@ -1,11 +1,13 @@
- <dl>
+<dl>
   <dt>id</dt>
   <dd><%= @game.external_id %></dd>
   <dt>started at</dt>
   <dd><%= l @game.created_at %></dd>
   <dt>finished at</dt>
   <dd><%= l @game.moves.last.created_at %></dd>
- </dl>
+  <dt>Snake version</dt>
+  <dd><%= version_link @game.snake_version %></dd>
+</dl>
 
 <%= link_to(image_tag(@game.gif_url), @game.external_url) %>
 
@@ -23,7 +25,7 @@
     <% @game.moves.each do |move| %>
       <tr class="move">
         <td>
-          <%= move.turn %>
+          <%= link_to move.turn, move_url(move) %>
         </td>
         <td>
           <%= move.decision %>

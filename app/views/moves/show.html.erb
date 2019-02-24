@@ -1,0 +1,48 @@
+<dl>
+  <dt>Game</dt>
+  <dd><%= link_to @game.external_id, game_path(@game) %></dd>
+  <dt>Time</dt>
+  <dd><%= l @move.created_at %></dd>
+  <dt>Runtime</dt>
+  <dd><%= number_with_precision(@move.runtime * 1000, precision: 1) %> ms</dd>
+  <dt>Snake version</dt>
+  <dd><%= version_link @game.snake_version %></dd>
+  <dt>Decision</dt>
+  <dd>
+    <% if @simulated_move.to_s == @move.decision.to_s %>
+      <%= @move.decision %>
+    <% else %>
+      was <%= @move.decision %>, would now be <%= @simulated_move %>
+    <% end %>
+  </dd>
+</dl>
+
+<%= link_to "< prev", move_path(@move.prev) %>
+<%= link_to "next >", move_path(@move.next) %>
+
+<table>
+  <thead>
+    <tr>
+      <th>Before</th>
+      <th>After</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>
+        <%= image_tag @move.before_image_url %>
+      </td>
+      <td>
+        <%= image_tag @move.after_image_url %>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <%= @move.heuristic_score %>
+      </td>
+      <td>
+        <%= @move.next&.heuristic_score %>
+      </td>
+    </tr>
+  </tbody>
+<table>
