@@ -4,6 +4,6 @@ class GamesController < ApplicationController
   end
 
   def show
-    @game = Storage::Game.find_by(params[:page])
+    @game = Storage::Game.find(params[:id])
   end
 end
