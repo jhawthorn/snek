@@ -1,6 +1,6 @@
 class GamesController < ApplicationController
   def index
-    @games = Storage::Game.page(params[:page])
+    @games = Storage::Game.order(id: :desc).page(params[:page])
   end
 
   def show
