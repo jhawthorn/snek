@@ -2,7 +2,7 @@ require 'rails_helper'
 
 class SnakeTest < ActionDispatch::IntegrationTest
   def test_start
-    post '/start'
+    post '/start', params: { game: { id: "game-id-string" } }, as: :json
     assert_response :success
     assert_equal %q({"color":"#6aec87","headType":"silly","tailType":"bolt"}), response.body
   end
@@ -109,5 +109,22 @@ class SnakeTest < ActionDispatch::IntegrationTest
     assert_move_from_payload :up, <<-JSON
     {"game":{"id":"a249aa6f-20f7-426c-a5a3-68e7447805df"},"turn":50,"board":{"height":15,"width":15,"food":[{"x":1,"y":13},{"x":5,"y":2},{"x":12,"y":1},{"x":3,"y":1},{"x":10,"y":0},{"x":2,"y":3},{"x":0,"y":14},{"x":11,"y":0},{"x":1,"y":7},{"x":6,"y":11}],"snakes":[{"id":"3e123a3e-ea7b-4fe6-8c08-6a328112c27e","name":"snek","health":98,"body":[{"x":5,"y":6},{"x":5,"y":5},{"x":4,"y":5},{"x":4,"y":6},{"x":4,"y":7},{"x":5,"y":7},{"x":6,"y":7}]},{"id":"ede45648-5e24-4134-9305-b6ba6f955b8d","name":"snek","health":86,"body":[{"x":6,"y":5},{"x":7,"y":5},{"x":7,"y":4},{"x":8,"y":4},{"x":8,"y":5},{"x":8,"y":6},{"x":8,"y":7}]}]},"you":{"id":"ede45648-5e24-4134-9305-b6ba6f955b8d","name":"snek","health":86,"body":[{"x":6,"y":5},{"x":7,"y":5},{"x":7,"y":4},{"x":8,"y":4},{"x":8,"y":5},{"x":8,"y":6},{"x":8,"y":7}]}}
     JSON
+  end
+
+  def test_creates_db_records
+    start_payload = { "game" => { "id" => "game-id-string" } }
+    post '/start', params: start_payload, as: :json
+    assert_response :success
+    assert_equal %q({"color":"#6aec87","headType":"silly","tailType":"bolt"}), response.body
+
+    game = Storage::Game.find_by!(external_id: "game-id-string")
+    assert_equal start_payload, game.initial_state
+    assert game.snake_version
+
+    move_payload = JSON.parse(File.read("#{Rails.root}/test/fixtures/4_player_large_game.json"))
+    post '/move', params: move_payload, as: :json
+    assert_response :success
+
+    assert_equal 1, game.moves.count
   end
 end

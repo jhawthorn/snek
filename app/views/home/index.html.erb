@@ -1,3 +1,3 @@
 <h1>Git Adder</h1>
 <p>I'm a snake competing in <%= link_to "Battlesnake", "https://play.battlesnake.io/" %></p>
-<p>Running commit <%= ENV['HEROKU_SLUG_COMMIT'] %>
+<p>Running commit <%= GitAdder.current_git_sha %></p>
