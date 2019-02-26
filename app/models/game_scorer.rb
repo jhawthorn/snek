@@ -43,7 +43,7 @@ class GameScorer
         -1 * (enemies.map(&:length).max || 0),
         -1 * enemies.sum(&:length),
 
-         1 * @bfs.voronoi_tiles[player],
+         2 * @bfs.voronoi_tiles[player],
         -1 * distance_to_food
     ].sum
   end
