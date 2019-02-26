@@ -7,6 +7,7 @@ class GameScorer
   def initialize(game, bfs: nil)
     @game = game
     @bfs = bfs || BoardBFS.new(@game.board)
+    @reachable_bfs = BoardBFS.new(@game.board, targets: [@game.player])
   end
 
   def score
@@ -21,7 +22,7 @@ class GameScorer
 
     # If we're 100% backed into a corner
     # This basically saves us one turn of simulation
-    if @bfs.voronoi_tiles[player] <= 1
+    if @bfs.tiles[player] <= 1
       return SCORE_MIN + 10
     end
 
@@ -36,6 +37,9 @@ class GameScorer
 
     enemies = @game.enemies.select(&:alive?)
 
+    player_voronoi = @bfs.tiles[player]
+    player_reachable = @reachable_bfs.tiles[player]
+
     [
         15 * player.length,
          1 * player.health,
@@ -43,8 +47,9 @@ class GameScorer
         -1 * (enemies.map(&:length).max || 0),
         -1 * enemies.sum(&:length),
 
-         2 * @bfs.voronoi_tiles[player],
-        -1 * distance_to_food
-    ].sum
+         2 * player_voronoi,
+         5 * player_reachable,
+        -1 * distance_to_food,
+    ].compact.sum
   end
 end

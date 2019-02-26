@@ -1,14 +1,15 @@
 class BoardBFS
   attr_reader :board
 
-  attr_reader :voronoi_tiles
+  attr_reader :tiles
   attr_reader :distance_to_food
 
-  def initialize(board)
+  def initialize(board, targets: nil)
     @board = board
     @snakes = board.snakes.select(&:alive?)
+    @targets = targets || @snakes
 
-    @voronoi_tiles = Hash.new(0).compare_by_identity
+    @tiles = Hash.new(0).compare_by_identity
     @distance_to_food = {}.compare_by_identity
 
     calculate
@@ -34,9 +35,11 @@ class BoardBFS
         next_queue << [snake.head.x, snake.head.y, snake]
       end
 
-      snake.tail.each do |point|
-        visited.set(point, true)
-      end
+      visited.set_all(snake.tail, true)
+    end
+
+    @targets.sort_by(&:length).reverse_each do |snake|
+      next_queue << [snake.head.x, snake.head.y, snake]
     end
 
     distance = 0
@@ -48,7 +51,7 @@ class BoardBFS
         next if visited.at(x,y)
         visited.set(x, y, true)
 
-        @voronoi_tiles[snake] += 1
+        @tiles[snake] += 1
 
         if food.at(x,y)
           @distance_to_food[snake] ||= distance
