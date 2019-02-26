@@ -39,7 +39,7 @@ class GameScorer
     [
         15 * player.length,
          1 * player.health,
-       -20 * enemies.count,
+       -15 * enemies.count,
         -1 * (enemies.map(&:length).max || 0),
         -1 * enemies.sum(&:length),
 
