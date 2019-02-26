@@ -47,6 +47,26 @@ class DecisionTest < MiniTest::Test
     assert_equal :down, move
   end
 
+  def test_will_eat_on_large_board
+    snake = Snake.new(body: [Point.new(5,5), Point.new(5,4), Point.new(5,3)])
+    board = Board.new(snakes: [snake], food: [Point.new(5,6)], width: 17)
+    game = Game.new(board: board, self_id: snake.id)
+
+    move =  MoveDecider.new(game).next_move
+
+    assert_equal :down, move
+  end
+
+  def test_will_eat_on_large_board_with_food_in_corner
+    snake = Snake.new(body: [Point.new(0,5), Point.new(0,4), Point.new(0,3)])
+    board = Board.new(snakes: [snake], food: [Point.new(0,6), Point.new(16,16)], width: 17)
+    game = Game.new(board: board, self_id: snake.id)
+
+    move =  MoveDecider.new(game).next_move
+
+    assert_equal :down, move
+  end
+
   def test_still_take_action_if_opponent_screwed
     snakes = [
       Snake.new(body: [Point.new(5,5), Point.new(5,6), Point.new(5,7)]),
