@@ -37,9 +37,9 @@ class GameScorer
     enemies = @game.enemies.select(&:alive?)
 
     [
-        50 * player.length,
+        15 * player.length,
          1 * player.health,
-      -250 * enemies.count,
+       -20 * enemies.count,
         -1 * (enemies.map(&:length).max || 0),
         -1 * enemies.sum(&:length),
 
