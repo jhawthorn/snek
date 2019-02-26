@@ -1,4 +1,4 @@
-require 'rails_helper'
+require 'test_helper'
 
 class SnakeTest < ActionDispatch::IntegrationTest
   def test_start
