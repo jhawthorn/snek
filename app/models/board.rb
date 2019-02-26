@@ -41,10 +41,16 @@ class Board
 
     snakes.each do |snake|
       action = actions[snake.id]
-      next unless action
 
-      new_head = snake.head.move(action)
-      snake.body.unshift(new_head)
+      if action
+        new_head = snake.head.move(action)
+        snake.body.unshift(new_head)
+      else
+        # Give it an extra segment in its head.
+        # This doesn't really represent how the game would handle this, but at
+        # least we preserve snake lengths this way.
+        snake.body.unshift(snake.head)
+      end
     end
 
     snakes.each do |snake|
