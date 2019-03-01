@@ -94,9 +94,17 @@ class DecisionTest < ActiveSupport::TestCase
   def test_will_eat_with_stuff_going_on
     game = game_fixture("input-a8500ec3-f10a-4eab-9bc0-9df1f2b95cfb-turn-178.json")
 
-    move =  MoveDecider.new(game).next_move
+    move = MoveDecider.new(game).next_move
 
     assert_equal :down, move
+  end
+
+  def test_will_eat_first_turn
+    game = game_fixture("input-54e3457f-b4c9-4cf1-8491-92784fa605ae-turn-0.json")
+
+    move = MoveDecider.new(game).next_move
+
+    assert_equal :right, move
   end
 
   def test_wont_eat_fully_surrounded
