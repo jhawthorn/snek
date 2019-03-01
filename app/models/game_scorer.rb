@@ -48,7 +48,7 @@ class GameScorer
       enemy_length: -1 * enemies.sum(&:length),
 
       player_voronoi: 2 * player_voronoi,
-      player_reachable: 1 * player_reachable,
+      player_reachable: 4 * player_reachable,
       player_near_food: -1 * distance_to_food,
     }
   end
