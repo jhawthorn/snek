@@ -136,4 +136,10 @@ class DecisionTest < ActiveSupport::TestCase
 
     refute_equal :down, move
   end
+
+  def test_doesnt_dead_end
+    game = game_fixture("input-5173cabc-56f4-43c2-8eb3-07416f4bc49f-turn-355.json")
+    move =  MoveDecider.new(game).next_move
+    assert_equal :down, move
+  end
 end

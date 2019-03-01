@@ -23,4 +23,16 @@ class ScorerTest < ActiveSupport::TestCase
 
     assert before < after
   end
+
+  def test_dead_end
+    game = game_fixture("input-5173cabc-56f4-43c2-8eb3-07416f4bc49f-turn-355.json")
+
+    game_up = game.simulate({ game.player.id => :up, game.enemies[0].id => :right })
+    game_down = game.simulate({ game.player.id => :down, game.enemies[0].id => :right })
+
+    scorer_up = GameScorer.new(game_up)
+    scorer_down = GameScorer.new(game_down)
+
+    assert scorer_up.score < scorer_down.score
+  end
 end

@@ -30,16 +30,17 @@ class BoardBFS
       -snake.length
     end
 
-    snakes.each do |snake|
-      unless board.out_of_bounds?(snake.head)
-        next_queue << [snake.head.x, snake.head.y, snake]
-      end
-
+    @targets.each do |snake|
       visited.set_all(snake.tail, true)
+    end
+    (snakes - @targets).each do |snake|
+      visited.set_all(snake.body, true)
     end
 
     @targets.sort_by(&:length).reverse_each do |snake|
-      next_queue << [snake.head.x, snake.head.y, snake]
+      unless board.out_of_bounds?(snake.head)
+        next_queue << [snake.head.x, snake.head.y, snake]
+      end
     end
 
     distance = 0
