@@ -1,6 +1,6 @@
 require "test_helper"
 
-class DecisionTest < MiniTest::Test
+class DecisionTest < ActiveSupport::TestCase
   def test_avoids_head_on
     snakes = [
       Snake.new(body: [Point.new(5,1), Point.new(4,1), Point.new(3,1)]),
@@ -89,6 +89,14 @@ class DecisionTest < MiniTest::Test
     move =  MoveDecider.new(game).next_move
 
     assert_equal :left, move
+  end
+
+  def test_will_eat_with_stuff_going_on
+    game = game_fixture("input-a8500ec3-f10a-4eab-9bc0-9df1f2b95cfb-turn-178.json")
+
+    move =  MoveDecider.new(game).next_move
+
+    assert_equal :down, move
   end
 
   def test_wont_eat_fully_surrounded

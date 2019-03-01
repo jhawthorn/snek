@@ -66,6 +66,7 @@ class Board
       if @food.include?(snake.head)
         eaten_food << snake.head
         snake.body << snake.body.last
+        snake.health = 100
       end
     end
     eaten_food.each do |food|

@@ -9,5 +9,9 @@ class ActiveSupport::TestCase
   # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
   fixtures :all
 
-  # Add more helper methods to be used by all tests here...
+  def game_fixture(filename)
+    path = "#{__dir__}/fixtures/#{filename}"
+    data = File.read(path)
+    Game.from_json(JSON.load(data))
+  end
 end
