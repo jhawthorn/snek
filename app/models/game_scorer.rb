@@ -10,20 +10,20 @@ class GameScorer
     @reachable_bfs = BoardBFS.new(@game.board, targets: [@game.player])
   end
 
-  def score
+  def score_description
     player = @game.player
-    return SCORE_MIN unless player.alive?
+    return { dead: SCORE_MIN } unless player.alive?
 
     # If there was at least one enemy, but now is dead, victory
     # Necessary so we still somewhat play a single player game
     if @game.enemies.any? && @game.enemies.none?(&:alive?)
-      return SCORE_MAX
+      return { won: SCORE_MAX }
     end
 
     # If we're 100% backed into a corner
     # This basically saves us one turn of simulation
     if @bfs.tiles[player] <= 1
-      return SCORE_MIN + 10
+      return { dies_next: SCORE_MIN + 10 }
     end
 
     distance_to_food = @bfs.distance_to_food[player] || @game.board.width * 2
@@ -40,16 +40,20 @@ class GameScorer
     player_voronoi = @bfs.tiles[player]
     player_reachable = @reachable_bfs.tiles[player]
 
-    [
-        15 * player.length,
-         1 * player.health,
-       -15 * enemies.count,
-        -1 * (enemies.map(&:length).max || 0),
-        -1 * enemies.sum(&:length),
+    {
+      length: 15 * player.length,
+      health: 1 * player.health,
+      enemy_remaining: -15 * enemies.count,
+      enemy_max_length: -1 * (enemies.map(&:length).max || 0),
+      enemy_length: -1 * enemies.sum(&:length),
 
-         2 * player_voronoi,
-         5 * player_reachable,
-        -1 * distance_to_food,
-    ].compact.sum
+      player_voronoi: 2 * player_voronoi,
+      player_reachable: 1 * player_reachable,
+      player_near_food: -1 * distance_to_food,
+    }
+  end
+
+  def score
+    score_description.values.compact.sum
   end
 end
