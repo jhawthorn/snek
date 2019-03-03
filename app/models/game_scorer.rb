@@ -41,14 +41,14 @@ class GameScorer
     player_reachable = @reachable_bfs.tiles[player]
 
     {
-      length: 15 * player.length,
+      length: 25 * player.length,
       health: 1 * player.health,
-      enemy_remaining: -15 * enemies.count,
+      enemy_remaining: -50 * enemies.count,
       enemy_max_length: -1 * (enemies.map(&:length).max || 0),
       enemy_length: -1 * enemies.sum(&:length),
 
-      player_voronoi: 2 * player_voronoi,
-      player_reachable: 4 * player_reachable,
+      player_voronoi: 1 * player_voronoi,
+      player_reachable: 2 * player_reachable,
       player_near_food: -1 * distance_to_food,
     }
   end
