@@ -1,7 +1,7 @@
 class Simulation
   attr_reader :turn, :width, :height, :board
 
-  def initialize
+  def initialize(scorer: nil)
     @turn = 0
     @width = @height = 11
 
@@ -65,7 +65,7 @@ class Simulation
           board: @board.dup
         )
 
-        move = MoveDecider.new(game).next_move
+        move = MoveDecider.new(game, scorer: @scorer).next_move
 
         [snake.id, move]
       end
@@ -78,7 +78,7 @@ class Simulation
   end
 
   def spawn_food!
-    existing = @board.snakes.select(&:alive?).map(&:body).inject(:+) + @board.food
+    existing = @board.snakes.select(&:alive?).map(&:body).inject([], :+) + @board.food
     food = 3.times.map do
       Point.new(rand(width), rand(height))
     end
