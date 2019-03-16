@@ -111,4 +111,15 @@ class SimulationTest < MiniTest::Test
     refute_predicate snakes[0], :alive?
     refute_predicate snakes[1], :alive?
   end
+
+  def test_simulation_works
+    simulation = Simulation.new
+    refute simulation.over?
+    assert_equal 2, simulation.board.snakes.count
+
+    simulation.run
+
+    assert simulation.over?
+    assert simulation.winner
+  end
 end

@@ -27,3 +27,7 @@ task :profile do
   puts cmd
   system cmd
 end
+
+task simulate: :environment do
+  Simulation.new.run(verbose: true)
+end
