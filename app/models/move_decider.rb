@@ -1,7 +1,7 @@
 class MoveDecider
   attr_reader :game, :board
 
-  def initialize(game)
+  def initialize(game, scorer: nil)
     @game = game
     @board = game.board
 
@@ -10,6 +10,8 @@ class MoveDecider
     @snakes.each do |snake|
       @walls.set_all(snake.body[0...-1], true)
     end
+
+    @scorer_builder = ->(g){ GameScorer.new(g) }
   end
 
   def considered_snakes
@@ -43,11 +45,11 @@ class MoveDecider
   class Possibility
     attr_reader :initial_game, :moves, :game, :scorer
 
-    def initialize(initial_game, moves)
+    def initialize(initial_game, moves, scorer)
       @initial_game = initial_game
       @moves = moves
       @game = @initial_game.simulate(moves)
-      @scorer = GameScorer.new(@game)
+      @scorer = scorer.call(@game)
     end
 
     def score
@@ -67,7 +69,7 @@ class MoveDecider
   def possible_futures
     @possible_futures ||=
       all_move_combinations.map do |moves|
-        Possibility.new(@game, moves)
+        Possibility.new(@game, moves, @scorer_builder)
       end
   end
 
