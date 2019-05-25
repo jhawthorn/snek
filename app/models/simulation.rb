@@ -41,7 +41,6 @@ class Simulation
       step
     end
     puts "winner is #{winner.name}" if verbose
-    puts @board.to_s
 
     winner
   end
