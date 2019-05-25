@@ -32,7 +32,7 @@ end
 
 def mutate(weights)
   weights = weights.dup
-  5.times do
+  rand(3).times do
     weights[rand(10)] += (rand - 0.5) * 0.1
   end
   weights
