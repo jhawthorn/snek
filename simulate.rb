@@ -59,11 +59,11 @@ def eliminate(initial_pop, desired)
 end
 
 i = 0
-pop = new_population(10)
+pop = new_population(16)
 50.times do
   puts "Round #{i}"
   i += 1
-  pop = eliminate(pop, 5)
+  pop = eliminate(pop, 8)
   pop += pop.map { |x| mutate(x) }
 
   # Show one round for fun
