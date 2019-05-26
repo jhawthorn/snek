@@ -40,19 +40,16 @@ end
 
 def eliminate(initial_pop, desired)
   pop = initial_pop.dup
-  eliminations = Hash.new(0)
 
-  i = 1
   until pop.size <= desired
-    puts "Match #{i} - #{pop.size} remain"
-    i += 1
-    a, b = pop.sample(2)
-    _winner, loser = winner_loser_from(a, b)
+    matches = pop.shuffle.each_slice(2).to_a
+    new_pop =
+      Parallel.map(matches, in_processes: 8) do |(a, b)|
+        winner, _loser = winner_loser_from(a, b)
 
-    eliminations[loser] += 1
-    if eliminations[loser] >= 2
-      pop.delete(loser)
-    end
+        winner
+      end
+    pop = new_pop
   end
 
   pop
