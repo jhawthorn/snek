@@ -1,9 +1,12 @@
 class Simulation
   attr_reader :turn, :width, :height, :board
 
+  INITIAL_FOOD = 6
+  DEFAULT_SIZE = 11
+
   def initialize(scorer: nil)
     @turn = 0
-    @width = @height = 11
+    @width = @height = DEFAULT_SIZE
 
     spawns = [
       Point.new(1,1),
@@ -18,18 +21,16 @@ class Simulation
       )
     end
 
-    food = 7.times.map do
-      Point.new(rand(width), rand(height))
-    end
-    food.uniq!
-    food -= spawns
-
     @board = Board.new(
       width: width,
       height: height,
       snakes: snakes,
-      food: food
+      food: []
     )
+
+    (INITIAL_FOOD / 2).times do
+      spawn_food!
+    end
   end
 
   def run(verbose: false)
@@ -79,10 +80,16 @@ class Simulation
 
   def spawn_food!
     existing = @board.snakes.select(&:alive?).map(&:body).inject([], :+) + @board.food
-    food = 3.times.map do
-      Point.new(rand(width), rand(height))
-    end
+    x = rand(width)
+    y = rand(height)
 
+    food = [
+      Point.new(x, y),
+      Point.new(width - x - 1, height - y - 1),
+    ]
+
+    food.uniq!
+    food -= @board.snakes.flat_map(&:body)
     food -= existing
 
     @board.food.concat food
