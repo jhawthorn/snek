@@ -41,7 +41,13 @@ class Simulation
       end
       step
     end
-    puts "winner is #{winner.name}" if verbose
+    if verbose
+      if winner
+        puts "winner is #{winner.name}"
+      else
+        puts "tie?"
+      end
+    end
 
     winner
   end
