@@ -2,7 +2,9 @@ class MlScorer
   SCORE_MIN = -999999999
   SCORE_MAX =  999999999
 
-  CARDINALITY = 8
+  SHAPE = [8, 4, 1]
+  EDGES = SHAPE.each_cons(2).map{|a,b| a * b }
+  CARDINALITY = EDGES.sum
 
   attr_reader :bfs
 
@@ -11,7 +13,10 @@ class MlScorer
     @bfs = bfs || BoardBFS.new(@game.board)
     @reachable_bfs = BoardBFS.new(@game.board, targets: [@game.player])
 
-    @weights = weights
+    weights = weights.dup
+    @weights = EDGES.map do |n|
+      weights.shift(n)
+    end
   end
 
   def player
@@ -34,9 +39,18 @@ class MlScorer
     return SCORE_MIN if lost?
     return SCORE_MAX if won?
 
-    score_info.map.with_index do |s, i|
-      s * @weights[0][i]
-    end.sum
+    nodes = score_info
+
+    SHAPE[1..-1].each_with_index do |layer_size, layer|
+      weights = @weights[layer].dup
+      nodes = (0...layer_size).map do |i|
+        nodes.map do |value|
+          value * weights.shift
+        end.sum
+      end
+    end
+
+    nodes[0]
   end
 
   def score_info

@@ -1,9 +1,10 @@
 require './config/environment'
 
+CARDINALITY = MlScorer::CARDINALITY
 MUTATION_RATE = 0.1
 
 def random_weights
-  Array.new(MlScorer::CARDINALITY) { rand - 0.5 }
+  Array.new(CARDINALITY) { rand - 0.5 }
 end
 
 def new_population(n)
@@ -13,7 +14,12 @@ end
 def winner_loser_from(a, b, verbose: false)
   weights = {}
   scorer = ->(g) do
-    MlScorer.new(g, weights: weights[g.player.id])
+    w = weights[g.player.id]
+    if w
+      MlScorer.new(g, weights: w)
+    else
+      GameScorer.new(g)
+    end
   end
 
   simulation = Simulation.new(scorer: scorer)
@@ -34,7 +40,7 @@ end
 
 def mutate(weights)
   weights = weights.dup
-  weights[rand(MlScorer::CARDINALITY)] = rand - 0.5
+  weights[rand(CARDINALITY)] = rand - 0.5
   weights
 end
 
@@ -84,9 +90,24 @@ ROUNDS.times do
   pop = eliminate(pop, ADVANCE)
 
   # Show one round for fun
-  winner_loser_from(*pop.sample(2), verbose: true)
+  winner, _ = winner_loser_from(*pop.sample(2), verbose: true)
+  puts "vs. hand tuned scorer..."
+  winner, _= winner_loser_from(winner, nil)
+  puts winner.nil? ? "  lost" : "  won"
 
   pop = reproduce(pop, POP)
 end
 best = eliminate(pop, 1)[0]
 puts "best: #{best.inspect}"
+puts
+puts "Testing against hand tuned scorer"
+
+ROUNDS_VS_TUNED = 100
+wins = Parallel.map(ROUNDS_VS_TUNED.times, in_processes: 8) do |seed|
+  Kernel.srand
+
+  !!winner_loser_from(best, nil)[0]
+end.count(true)
+losses = ROUNDS_VS_TUNED - wins
+
+puts "  wins: #{wins}, losses: #{losses}"
