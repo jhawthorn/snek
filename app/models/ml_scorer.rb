@@ -2,7 +2,7 @@ class MlScorer
   SCORE_MIN = -999999999
   SCORE_MAX =  999999999
 
-  SHAPE = [8, 1]
+  SHAPE = [8, 8, 4, 1]
   EDGES = SHAPE.each_cons(2).map{|a,b| a * b }
   CARDINALITY = EDGES.sum
 
@@ -48,9 +48,15 @@ class MlScorer
           value * weights.shift
         end.sum
       end
+
+      nodes = nodes.map{ |x| activation(x) }
     end
 
     nodes[0]
+  end
+
+  def activation(x)
+    x > 0.0 ? x : 0.0
   end
 
   def score_info

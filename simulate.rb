@@ -1,7 +1,7 @@
 require './config/environment'
 
 CARDINALITY = MlScorer::CARDINALITY
-MUTATION_RATE = 0.1
+MUTATION_RATE = 0.05
 
 def random_weights
   Array.new(CARDINALITY) { rand - 0.5 }
@@ -22,7 +22,8 @@ def winner_loser_from(a, b, verbose: false)
     end
   end
 
-  simulation = Simulation.new(scorer: scorer)
+  size = [7,11,19].sample
+  simulation = Simulation.new(scorer: scorer, size: size)
   weights[simulation.board.snakes[0].id] = a
   weights[simulation.board.snakes[1].id] = b
   simulation.run(verbose: verbose)
@@ -39,9 +40,13 @@ def winner_loser_from(a, b, verbose: false)
 end
 
 def mutate(weights)
-  weights = weights.dup
-  weights[rand(CARDINALITY)] = rand - 0.5
-  weights
+  weights.map do |original|
+    if rand < MUTATION_RATE
+      rand - 0.5
+    else
+      original
+    end
+  end
 end
 
 def eliminate(initial_pop, desired)
@@ -71,18 +76,15 @@ def reproduce(initial_pop, desired)
   end
 
   pop.map do |member|
-    while rand < MUTATION_RATE
-      member = mutate(member)
-    end
-
-    member
+    mutate(member)
   end
 end
 
 i = 0
-POP = 64
-ADVANCE = 16
+POP = 16
+ADVANCE = 8
 pop = new_population(POP)
+
 ROUNDS = 50
 ROUNDS.times do
   puts "Round #{i}"

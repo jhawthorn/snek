@@ -4,9 +4,9 @@ class Simulation
   INITIAL_FOOD = 6
   DEFAULT_SIZE = 11
 
-  def initialize(scorer: nil)
+  def initialize(size: DEFAULT_SIZE, scorer: nil)
     @turn = 0
-    @width = @height = DEFAULT_SIZE
+    @width = @height = size
     @scorer = scorer
 
     spawns = [
