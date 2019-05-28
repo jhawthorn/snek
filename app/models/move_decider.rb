@@ -11,7 +11,7 @@ class MoveDecider
       @walls.set_all(snake.body[0...-1], true)
     end
 
-    @scorer_builder = ->(g){ GameScorer.new(g) }
+    @scorer_builder = scorer || ->(g){ GameScorer.new(g) }
   end
 
   def considered_snakes

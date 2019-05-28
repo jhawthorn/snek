@@ -14,6 +14,10 @@ class MlScorer
     @weights = weights
   end
 
+  def player
+    @player ||= @game.player
+  end
+
   def lost?
     !player.alive?
   end
@@ -30,9 +34,9 @@ class MlScorer
     return SCORE_MIN if lost?
     return SCORE_MAX if won?
 
-    score_info.sum.with_index do |s, i|
-      s * @weights[i]
-    end
+    score_info.map.with_index do |s, i|
+      s * @weights[0][i]
+    end.sum
   end
 
   def score_info
@@ -56,7 +60,7 @@ class MlScorer
       enemies.sum(&:length),
 
       player_food_distance,
-      enemy_food_distance,
+      enemy_food_distance.max,
 
       player_voronoi,
       enemy_voronoi,

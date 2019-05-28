@@ -7,6 +7,7 @@ class Simulation
   def initialize(scorer: nil)
     @turn = 0
     @width = @height = DEFAULT_SIZE
+    @scorer = scorer
 
     spawns = [
       Point.new(1,1),
