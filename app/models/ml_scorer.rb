@@ -2,7 +2,7 @@ class MlScorer
   SCORE_MIN = -999999999
   SCORE_MAX =  999999999
 
-  CARDINALITY = 10
+  CARDINALITY = 8
 
   attr_reader :bfs
 
@@ -55,8 +55,8 @@ class MlScorer
       player.length,
       player.health,
 
-      enemies.count,
-      enemies.map(&:length).max || 0,
+      #enemies.count,
+      #enemies.map(&:length).max || 0,
       enemies.sum(&:length),
 
       player_food_distance,
