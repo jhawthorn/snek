@@ -50,7 +50,7 @@ def eliminate(initial_pop, desired)
   until pop.size <= desired
     matches = pop.shuffle.each_slice(2).to_a
     new_pop =
-      Parallel.map(matches, in_processes: 8) do |(a, b)|
+      Parallel.map(matches, in_processes: 8, progress: "Simulating") do |(a, b)|
         winner, _loser = winner_loser_from(a, b)
 
         winner
@@ -71,17 +71,17 @@ def reproduce(initial_pop, desired)
   end
 
   pop.map do |member|
-    if rand < MUTATION_RATE
-      mutate(member)
-    else
-      member
+    while rand < MUTATION_RATE
+      member = mutate(member)
     end
+
+    member
   end
 end
 
 i = 0
-POP = 16
-ADVANCE = 8
+POP = 64
+ADVANCE = 16
 pop = new_population(POP)
 ROUNDS = 50
 ROUNDS.times do
@@ -103,7 +103,7 @@ puts
 puts "Testing against hand tuned scorer"
 
 ROUNDS_VS_TUNED = 100
-wins = Parallel.map(ROUNDS_VS_TUNED.times, in_processes: 8) do |seed|
+wins = Parallel.map(ROUNDS_VS_TUNED.times, in_processes: 8, progress: "Simulating") do |seed|
   Kernel.srand
 
   !!winner_loser_from(best, nil)[0]
