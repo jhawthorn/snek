@@ -1,4 +1,4 @@
-FROM ruby:2.6.1
+FROM ruby:2.7.0
 MAINTAINER john@hawthorn.email
 
 RUN \
@@ -19,7 +19,7 @@ ENV \
 
 COPY Gemfile Gemfile.lock package.json yarn.lock ./
 RUN \
-  gem install bundler && \
+  gem install bundler:1.17.3 && \
   bundle config build.nokogiri --use-system-libraries && \
   bundle install --jobs 20 --retry 5 --without development:test && \
   yarn
