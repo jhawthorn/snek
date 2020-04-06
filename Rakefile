@@ -5,20 +5,20 @@ require_relative 'config/application'
 
 Rails.application.load_tasks
 
-task :profile do
-  $LOAD_PATH.unshift "#{__dir__}/lib"
-  require "snake"
-  require "json"
+task :profile => :environment do
   require "stackprof"
 
   fixture = File.read("#{__dir__}/test/fixtures/8_player_large_game.json")
   game = Game.from_json(JSON.parse(fixture))
-  MoveDecider.new(game).next_move
+
+  time = Benchmark.ms { MoveDecider.new(game).next_move }
+  runs = (10000 / time).round
+  runs = 10 if runs < 10
 
   puts "Profiling..."
   output = "stackprof-cpu-snake.dump"
   StackProf.run(mode: :cpu, out: output) do
-    10.times do
+    runs.times do
       MoveDecider.new(game).next_move
     end
   end
