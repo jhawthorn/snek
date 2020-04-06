@@ -14,10 +14,11 @@ task :profile => :environment do
   time = Benchmark.ms { MoveDecider.new(game).next_move }
   runs = (10000 / time).round
   runs = 10 if runs < 10
+  mode = ENV.fetch("STACKPROF_MODE", "cpu")
 
   puts "Profiling..."
-  output = "stackprof-cpu-snake.dump"
-  StackProf.run(mode: :cpu, out: output) do
+  output = "stackprof-#{mode}-snake.dump"
+  StackProf.run(mode: mode.to_sym, out: output) do
     runs.times do
       MoveDecider.new(game).next_move
     end
