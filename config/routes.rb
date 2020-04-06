@@ -10,7 +10,7 @@ Rails.application.routes.draw do
 
   concerns :snake
 
-  namespace :ml, default: { ml: true } do
+  scope "/ml", default: { ml: true } do
     concerns :snake
   end
 
