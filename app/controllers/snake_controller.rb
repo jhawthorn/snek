@@ -23,7 +23,7 @@ class SnakeController < ActionController::API
   def move
     start_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
     game = Game.from_json(request_json)
-    move_decider = MoveDecider.new(game)
+    move_decider = MoveDecider.new(game, scorer: scorer_builder)
     next_move = move_decider.next_move
     finish_time = Process.clock_gettime(Process::CLOCK_MONOTONIC)
 
@@ -68,5 +68,13 @@ class SnakeController < ActionController::API
         request_body = request.body.read
         request_body ? JSON.parse(request_body) : {}
       end
+  end
+
+  def scorer_builder
+    if params[:ml]
+      ->(g) { MlScorer.new(g, weights: DefaultWeights) }
+    else
+      ->(g) { GameScorer.new(g) }
+    end
   end
 end
