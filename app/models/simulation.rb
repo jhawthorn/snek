@@ -4,15 +4,25 @@ class Simulation
   INITIAL_FOOD = 6
   DEFAULT_SIZE = 11
 
-  def initialize(size: DEFAULT_SIZE, scorer: nil)
+  def initialize(size: DEFAULT_SIZE, snake_count: 2, scorer: nil)
     @turn = 0
     @width = @height = size
     @scorer = scorer
 
-    spawns = [
-      Point.new(1,1),
-      Point.new(width-2,height-2),
+    possible_spawns = [
+      Point.new(1, 1),
+      Point.new(width/2, 1),
+      Point.new(width-2, 1),
+
+      Point.new(1,height/2),
+      Point.new(width-2,height/2),
+
+      Point.new(1, height-2),
+      Point.new(width/2, height-2),
+      Point.new(width-2, height-2),
     ]
+
+    spawns = possible_spawns.sample(snake_count)
 
     snakes = spawns.map.with_index do |spawn, i|
       id = "snake#{i}"

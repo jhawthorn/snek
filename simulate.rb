@@ -12,7 +12,9 @@ def new_population(n)
   Array.new(n) { random_weights }
 end
 
-def winner_loser_from(a, b, verbose: false)
+def winner_losers_from(*snakes, verbose: false)
+  raise unless snakes.size >= 2
+
   weights = {}
   scorer = ->(g) do
     w = weights[g.player.id]
@@ -23,21 +25,26 @@ def winner_loser_from(a, b, verbose: false)
     end
   end
 
-  size = [7,11,19].sample
-  simulation = Simulation.new(scorer: scorer, size: size)
-  weights[simulation.board.snakes[0].id] = a
-  weights[simulation.board.snakes[1].id] = b
+  #size = [7,11,19].sample
+  size = 11
+  simulation = Simulation.new(scorer: scorer, snake_count: snakes.size, size: size)
+
+  snakes.size.times do |i|
+    weights[simulation.board.snakes[i].id] = snakes[i]
+  end
   simulation.run(verbose: verbose)
 
   if simulation.winner.nil?
     # tie? whatever.
-    return [a,b].shuffle
+    winner = snakes.sample
+    return [winner, (snakes - [winner])]
   end
 
-  winner = simulation.winner.id
-  loser = (simulation.board.snakes.map(&:id) - [winner])[0]
+  winner_id = simulation.winner.id
+  winner = weights.delete(winner_id)
+  losers = weights.values
 
-  [weights[winner], weights[loser]]
+  [winner, losers]
 end
 
 def mutate(weights)
@@ -57,7 +64,7 @@ def eliminate(initial_pop, desired)
     matches = pop.shuffle.each_slice(2).to_a
     new_pop =
       Parallel.map(matches, in_processes: N_PROC, progress: "Simulating") do |(a, b)|
-        winner, _loser = winner_loser_from(a, b)
+        winner, _loser = winner_losers_from(a, b)
 
         winner
       end
@@ -93,9 +100,9 @@ ROUNDS.times do
   pop = eliminate(pop, ADVANCE)
 
   # Show one round for fun
-  winner, _ = winner_loser_from(*pop.sample(2), verbose: true)
+  winner, _ = winner_losers_from(*pop.sample(2), verbose: true)
   puts "vs. hand tuned scorer..."
-  winner, _= winner_loser_from(winner, nil)
+  winner, _= winner_losers_from(winner, nil)
   puts winner.nil? ? "  lost" : "  won"
 
   pop = reproduce(pop, POP)
@@ -109,7 +116,7 @@ ROUNDS_VS_TUNED = 100
 wins = Parallel.map(ROUNDS_VS_TUNED.times, in_processes: N_PROC, progress: "Simulating") do |seed|
   Kernel.srand
 
-  !!winner_loser_from(best, nil)[0]
+  !!winner_losers_from(best, nil)[0]
 end.count(true)
 losses = ROUNDS_VS_TUNED - wins
 
