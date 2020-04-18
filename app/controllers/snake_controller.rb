@@ -7,7 +7,7 @@ class SnakeController < ActionController::API
 
   def start
     json = request_json
-    Storage::Game.create!(
+    Storage::Game.create(
       external_id: json["game"]["id"],
       initial_state: json,
       snake_version: GitAdder.current_git_sha
