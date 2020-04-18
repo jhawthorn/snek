@@ -33,3 +33,8 @@ environment ENV.fetch("RAILS_ENV") { "development" }
 
 # Allow puma to be restarted by `rails restart` command.
 plugin :tmp_restart
+
+require 'barnes'
+before_fork do
+  Barnes.start # Must have enabled worker mode for this to block to be called
+end

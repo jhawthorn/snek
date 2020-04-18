@@ -29,6 +29,7 @@ gem 'jbuilder', '~> 2.5'
 gem 'bootsnap', '>= 1.4.2', require: false
 
 gem 'kaminari'
+gem 'barnes'
 
 group :production do
   gem 'pg'
