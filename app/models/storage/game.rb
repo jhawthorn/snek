@@ -1,4 +1,19 @@
 class Storage::Game < ApplicationRecord
+  module GzipJSON
+    extend self
+
+    def load(data)
+      if data && data.getbyte(0) == 31 && data.getbyte(1) == 139
+        data = Zlib.gunzip(data)
+      end
+      JSON.load(data)
+    end
+
+    def dump(data)
+      Zlib.gzip(JSON.dump(data))
+    end
+  end
+
   serialize :initial_state, JSON
 
   has_many :moves
