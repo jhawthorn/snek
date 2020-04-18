@@ -1,10 +1,10 @@
 class Grid
   attr_reader :width, :height
 
-  def initialize(width, height, default: nil)
+  def initialize(width, height, default: nil, grid: nil)
     @width = width
     @height = height
-    @grid = Array.new(width * height, default)
+    @grid = grid || Array.new(width * height, default)
   end
 
   def get(x, y=nil)
