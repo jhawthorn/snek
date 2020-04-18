@@ -1,3 +1,3 @@
 require "mkmf"
 
-create_makefile("cnek/cnek")
+create_makefile("cnek")

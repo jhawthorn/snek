@@ -10,5 +10,6 @@ Gem::Specification.new do |spec|
   spec.description   = %q{There's C in here}
 
   spec.files         = Dir["ext/**/*.{c,h,rb}", base: __dir__]
+  spec.require_paths = ["lib"]
   spec.extensions    = ["ext/cnek/extconf.rb"]
 end
