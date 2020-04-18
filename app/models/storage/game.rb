@@ -15,6 +15,7 @@ class Storage::Game < ApplicationRecord
   end
 
   serialize :initial_state, JSON
+  serialize :move_data, GzipJSON
 
   has_many :moves
 

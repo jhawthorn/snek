@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_02_23_233013) do
+ActiveRecord::Schema.define(version: 2020_04_18_003255) do
 
   create_table "storage_games", force: :cascade do |t|
     t.string "external_id", null: false
@@ -19,6 +19,7 @@ ActiveRecord::Schema.define(version: 2019_02_23_233013) do
     t.boolean "victory"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.binary "move_data"
   end
 
   create_table "storage_moves", force: :cascade do |t|
