@@ -85,7 +85,7 @@ class SnakeTest < ActionDispatch::IntegrationTest
 
   end
 
-  def test_move_from_play_battlesnake_io
+  def test_move_from_play_battlesnake_com
     assert_success_from_payload <<-JSON
 {"game":{"id":"684e74c2-68d6-4e58-a041-9d0c348161bb"},"turn":0,"board":{"height":11,"width":11,"food":[{"x":3,"y":7}],"snakes":[{"id":"gs_KGTDGScKhKSFYB8VPjm3pFJb","name":"snek","health":100,"body":[{"x":1,"y":1},{"x":1,"y":1},{"x":1,"y":1}]},{"id":"gs_tcbXTtDddv4dCVwgmq4r9T9d","name":"snek","health":100,"body":[{"x":9,"y":9},{"x":9,"y":9},{"x":9,"y":9}]}]},"you":{"id":"gs_tcbXTtDddv4dCVwgmq4r9T9d","name":"snek","health":100,"body":[{"x":9,"y":9},{"x":9,"y":9},{"x":9,"y":9}]}}
     JSON
