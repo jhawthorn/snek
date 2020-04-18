@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Storage::Game < ApplicationRecord
   module GzipJSON
     extend self
@@ -44,5 +46,29 @@ class Storage::Game < ApplicationRecord
 
   def to_param
     external_id
+  end
+
+  def frame_data
+    return @frame_data if defined?(@frame_data)
+
+    offset = 0
+    @frame_data = []
+    loop do
+      uri = URI.parse("https://engine.battlesnake.com/games/#{external_id}/frames?offset=#{offset}")
+      response = Net::HTTP.get_response(uri)
+      if Net::HTTPOK === response
+        data = JSON.parse(response.body)
+        @frame_data.concat data["Frames"]
+
+        if data["Count"] < 100
+          return @frame_data
+        end
+
+        offset += 100
+      else
+        @frame_data = nil
+        return
+      end
+    end
   end
 end

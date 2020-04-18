@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Storage::Move < ApplicationRecord
   serialize :state, JSON
   serialize :evaluations, JSON
@@ -36,5 +38,12 @@ class Storage::Move < ApplicationRecord
 
   def simulated_game
     @game ||= ::Game.from_json(state)
+  end
+
+  def remote_latency
+    my_id = state["you"]["id"]
+    frame = game.frame_data.detect { |x| x["Turn"] == turn + 1 }
+    my_snake = frame && frame["Snakes"].detect { |x| x["ID"] == my_id }
+    latency = (my_snake && my_snake["Latency"]).to_i
   end
 end

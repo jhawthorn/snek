@@ -33,7 +33,8 @@
           <%= move.decision %>
         </td>
         <td>
-          <%= number_with_precision(move.runtime * 1000, precision: 1) %> ms
+          <%= number_with_precision(move.runtime * 1000, precision: 1) %> ms /
+          <%= number_with_precision(move.remote_latency, precision: 1) %> ms
         </td>
         <td>
           <%= move.remaining_snakes %>
