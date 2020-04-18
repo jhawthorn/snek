@@ -110,7 +110,7 @@ class Board
     letters = (?a..?z).to_a
     @snakes.select(&:alive?).each do |snake|
       letter = letters.shift
-      grid.set(snake.head, letter.upcase)
+      grid.set(snake.head.x, snake.head.y, letter.upcase)
       grid.set_all(snake.tail, letter)
     end
     grid.set_all(food, '*')

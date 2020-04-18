@@ -34,8 +34,12 @@ class Point
     x == other.x && y == other.y
   end
 
+  def to_a
+    [x, y]
+  end
+
   def hash
-    [x, y].hash
+    to_a.hash
   end
 
   def inspect

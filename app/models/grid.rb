@@ -20,19 +20,14 @@ class Grid
     @grid[y * @width + x]
   end
 
-  def set(x, y, value=nil)
-    unless value
-      value = y
-      y = x.y
-      x = x.x
-    end
+  def set(x, y, value)
     raise if x < 0 || y < 0 || x >= @width || y >= @height
     @grid[y * @width + x] = value
   end
 
   def set_all(points, value)
     points.each do |point|
-      self.set(point, value)
+      self.set(point.x, point.y, value)
     end
   end
 

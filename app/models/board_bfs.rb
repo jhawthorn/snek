@@ -6,7 +6,9 @@ class BoardBFS
 
   def initialize(board, targets: nil)
     @board = board
-    @snakes = board.snakes.select(&:alive?)
+    @snakes = board.snakes.select(&:alive?).sort_by do |snake|
+      -snake.length
+    end
     @targets = targets || @snakes
 
     @tiles = Hash.new(0).compare_by_identity
@@ -16,8 +18,8 @@ class BoardBFS
   end
 
   def calculate
-    visited = Grid.new(board.width, board.height)
-    food = Grid.new(board.width, board.height)
+    visited = Cnek::Grid.new(board.width, board.height)
+    food = Cnek::Grid.new(board.width, board.height)
 
     width_1 = @board.width - 1
     height_1 = @board.height - 1
@@ -26,14 +28,10 @@ class BoardBFS
 
     food.set_all(board.food, true)
 
-    snakes = @snakes.sort_by do |snake|
-      -snake.length
-    end
-
     @targets.each do |snake|
       visited.set_all(snake.tail, true)
     end
-    (snakes - @targets).each do |snake|
+    (@snakes - @targets).each do |snake|
       visited.set_all(snake.body, true)
     end
 
@@ -64,13 +62,14 @@ class BoardBFS
         next_queue << [x, y-1, snake] if y > 0
       end
 
-      snakes.each do |snake|
+      @snakes.each do |snake|
         break if distance == 0
         break if snake.length < distance
         next if snake.length < distance-1 && snake.body[-distance] == snake.body[-distance-1]
         next if @distance_to_food[snake]
 
-        visited.set(snake.body[-distance], false)
+        segment = snake.body[-distance]
+        visited.set(segment.x, segment.y, false)
       end
 
       distance += 1

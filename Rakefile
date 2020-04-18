@@ -14,6 +14,7 @@ task :profile => :environment do
   time = Benchmark.ms { MoveDecider.new(game).next_move }
   runs = (10000 / time).round
   runs = 10 if runs < 10
+  puts "testing against #{runs} runs"
   mode = ENV.fetch("STACKPROF_MODE", "cpu")
 
   puts "Profiling..."
