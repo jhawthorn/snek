@@ -9,7 +9,9 @@ def random_weights
 end
 
 def new_population(n)
-  Array.new(n) { random_weights }
+  pop = Array.new(n) { random_weights }
+  pop[0] = DefaultWeights
+  pop
 end
 
 def winner_losers_from(*snakes, verbose: false)
@@ -60,27 +62,36 @@ end
 def eliminate(initial_pop, desired)
   pop = initial_pop.dup
 
-  until pop.size <= desired
-    matches = pop.shuffle.each_slice(2).to_a
-    new_pop =
-      Parallel.map(matches, in_processes: N_PROC, progress: "Simulating") do |(a, b)|
-        winner, _loser = winner_losers_from(a, b)
+  wins = Hash.new(0)
 
-        winner
-      end
-    pop = new_pop
+  matches = 32.times.flat_map { pop.shuffle.each_slice(4).to_a }
+  Parallel.map(matches, in_processes: N_PROC, progress: "Simulating") do |(a, b)|
+    winner, _loser = winner_losers_from(a, b)
+
+    winner
+  end.each do |winner|
+    wins[winner] += 1
   end
 
-  pop
+  p wins.values
+
+  pop.shuffle.sort_by{|s| -wins[s] }.first(desired)
 end
 
 def reproduce(initial_pop, desired)
   pop = initial_pop.dup
 
   while pop.size < desired
-    a, b = initial_pop.sample(2)
-    child = a.zip(b).map(&:sample)
-    pop << child
+    while pop.size < desired
+      a, b = initial_pop.sample(2)
+      child = a.zip(b).map(&:sample)
+      pop << child
+    end
+
+    # normalize
+    pop.map! { |x| x.map { |y| y.round(2) } }
+
+    pop.uniq!
   end
 
   pop.map do |member|
@@ -90,17 +101,21 @@ end
 
 i = 0
 POP = 64
-ADVANCE = 16
+ADVANCE = 8
 pop = new_population(POP)
 
-ROUNDS = 500
+ROUNDS = 100
 ROUNDS.times do
   puts "Round #{i}"
   i += 1
   pop = eliminate(pop, ADVANCE)
 
+  puts "best:"
+  p pop[0]
+  puts
+
   # Show one round for fun
-  winner, _ = winner_losers_from(*pop.sample(2), verbose: true)
+  winner, _ = winner_losers_from(*pop.sample(4), verbose: true)
   puts "vs. hand tuned scorer..."
   winner, _= winner_losers_from(winner, nil)
   puts winner.nil? ? "  lost" : "  won"
