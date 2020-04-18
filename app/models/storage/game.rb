@@ -35,11 +35,11 @@ class Storage::Game < ApplicationRecord
   end
 
   def gif_url
-    "http://exporter.battlesnake.com/games/#{external_id}?output=gif"
+    "https://exporter.battlesnake.com/games/#{external_id}/gif"
   end
 
   def turn_image_url(turn)
-    "http://exporter.battlesnake.com/games/#{external_id}/frames/#{turn}?output=png"
+    "https://exporter.battlesnake.com/games/#{external_id}/frames/#{turn}/gif"
   end
 
   def to_param
