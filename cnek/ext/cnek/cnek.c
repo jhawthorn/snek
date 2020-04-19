@@ -13,9 +13,21 @@ struct snake_grid {
   VALUE *values;
 };
 
+static void free_grid(struct snake_grid *grid) {
+  if (grid->values)
+    xfree(grid->values);
+  free(grid);
+}
+
+static void mark_grid(struct snake_grid *grid) {
+  if (grid->values)
+    for (unsigned int i = 0; i < grid->width * grid->height; i++)
+      rb_gc_mark(grid->values[i]);
+}
+
 static VALUE allocate_grid(VALUE klass) {
   struct snake_grid *grid;
-  VALUE obj = Data_Make_Struct(klass, struct snake_grid, NULL, NULL, grid);
+  VALUE obj = Data_Make_Struct(klass, struct snake_grid, mark_grid, free_grid, grid);
 
   grid->width = grid->height = 0;
   grid->values = NULL;
@@ -90,9 +102,16 @@ struct snake_queue {
   } entries[QUEUE_MAX_LEN];
 };
 
+static void mark_queue(struct snake_queue *queue) {
+  rb_gc_mark(queue->visited_obj);
+
+  for (int i = 0; i < queue->length; i++)
+    rb_gc_mark(queue->entries[i].val);
+}
+
 static VALUE allocate_queue(VALUE klass) {
   struct snake_queue *queue;
-  VALUE obj = Data_Make_Struct(klass, struct snake_queue, NULL, NULL, queue);
+  VALUE obj = Data_Make_Struct(klass, struct snake_queue, mark_queue, free, queue);
 
   queue->length = 0;
   queue->visited_obj = Qnil;
