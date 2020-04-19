@@ -121,6 +121,13 @@ static VALUE rb_cnekqueue_empty(VALUE self) {
   return queue->length == 0 ? Qtrue : Qfalse;
 }
 
+static void queue_add(struct snake_queue *queue, unsigned int x, unsigned int y, VALUE val) {
+  queue->entries[queue->length].x = x;
+  queue->entries[queue->length].y = y;
+  queue->entries[queue->length].val = val;
+  queue->length++;
+}
+
 static VALUE rb_cnekqueue_add(VALUE self, VALUE x, VALUE y, VALUE val) {
   struct snake_queue *queue;
   Data_Get_Struct(self, struct snake_queue, queue);
@@ -129,10 +136,7 @@ static VALUE rb_cnekqueue_add(VALUE self, VALUE x, VALUE y, VALUE val) {
     rb_raise(rb_eRuntimeError, "queue too big");
   }
 
-  queue->entries[queue->length].x = FIX2UINT(x);
-  queue->entries[queue->length].y = FIX2UINT(y);
-  queue->entries[queue->length].val = val;
-  queue->length++;
+  queue_add(queue, FIX2UINT(x), FIX2UINT(y), val);
 
   return Qnil;
 }
@@ -140,11 +144,20 @@ static VALUE rb_cnekqueue_add(VALUE self, VALUE x, VALUE y, VALUE val) {
 static VALUE rb_cnekqueue_each(VALUE self) {
   struct snake_queue *queue;
   Data_Get_Struct(self, struct snake_queue, queue);
+  struct snake_grid *grid = queue->visited;
 
   for (int i = 0; i < queue->length; i++) {
+    unsigned int x = queue->entries[i].x;
+    unsigned int y = queue->entries[i].y;
+
+    if (grid->values[y * grid->width + x]) {
+      continue;
+    }
+    grid->values[y * grid->width + x] = Qtrue;
+
     rb_yield_values(3,
-        INT2FIX(queue->entries[i].x),
-        INT2FIX(queue->entries[i].y),
+        INT2FIX(x),
+        INT2FIX(y),
         queue->entries[i].val);
   }
 

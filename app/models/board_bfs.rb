@@ -47,9 +47,6 @@ class BoardBFS
       next_queue = Cnek::Queue.new(visited)
 
       queue.each do |x, y, snake|
-        next if visited.at(x,y)
-        visited.set(x, y, true)
-
         @tiles[snake] += 1
 
         if food.at(x,y)
