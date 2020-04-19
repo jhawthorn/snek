@@ -141,6 +141,31 @@ static VALUE rb_cnekqueue_add(VALUE self, VALUE x, VALUE y, VALUE val) {
   return Qnil;
 }
 
+static VALUE rb_cnekqueue_add_neighbours(VALUE self, VALUE xval, VALUE yval, VALUE val) {
+  struct snake_queue *queue;
+  Data_Get_Struct(self, struct snake_queue, queue);
+  struct snake_grid *grid = queue->visited;
+
+  if (queue->length + 4 > QUEUE_MAX_LEN) {
+    rb_raise(rb_eRuntimeError, "queue too big");
+  }
+
+  unsigned int x = FIX2INT(xval);
+  unsigned int y = FIX2INT(yval);
+
+
+  if (x < grid->width - 1)
+    queue_add(queue, x+1, y, val);
+  if (x > 0)
+    queue_add(queue, x-1, y, val);
+  if (y < grid->height - 1)
+    queue_add(queue, x, y+1, val);
+  if (y > 0)
+    queue_add(queue, x, y-1, val);
+
+  return self;
+}
+
 static VALUE rb_cnekqueue_each(VALUE self) {
   struct snake_queue *queue;
   Data_Get_Struct(self, struct snake_queue, queue);
@@ -180,16 +205,15 @@ Init_cnek(void)
   i_y = rb_intern("y");
 
   rb_mCnek = rb_define_module("Cnek");
-  //rb_define_singleton_method(mod, "calculate_bfs", rb_cnek_calculate_bfs, 1);
 
   rb_cCnekGrid = rb_define_class_under(rb_mCnek, "Queue", rb_cObject);
   rb_define_alloc_func(rb_cCnekGrid, allocate_queue);
   rb_define_method(rb_cCnekGrid, "initialize", rb_cnekqueue_initialize, 1);
   rb_define_method(rb_cCnekGrid, "add", rb_cnekqueue_add, 3);
+  rb_define_method(rb_cCnekGrid, "add_neighbours", rb_cnekqueue_add_neighbours, 3);
   rb_define_method(rb_cCnekGrid, "each", rb_cnekqueue_each, 0);
   rb_define_method(rb_cCnekGrid, "empty?", rb_cnekqueue_empty, 0);
   rb_define_method(rb_cCnekGrid, "clear", rb_cnekqueue_clear, 0);
-  //rb_define_method(rb_cCnekGrid, "set_all", rb_cnekgrid_set_all, 2);
 
   rb_cCnekGrid = rb_define_class_under(rb_mCnek, "Grid", rb_cObject);
   rb_define_alloc_func(rb_cCnekGrid, allocate_grid);

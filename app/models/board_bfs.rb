@@ -53,10 +53,7 @@ class BoardBFS
           @distance_to_food[snake] ||= distance
         end
 
-        next_queue.add(x+1, y, snake) if x < width_1
-        next_queue.add(x-1, y, snake) if x > 0
-        next_queue.add(x, y+1, snake) if y < height_1
-        next_queue.add(x, y-1, snake) if y > 0
+        next_queue.add_neighbours(x, y, snake)
       end
 
       @snakes.each do |snake|
