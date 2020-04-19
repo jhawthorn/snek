@@ -164,6 +164,15 @@ static VALUE rb_cnekqueue_each(VALUE self) {
   return self;
 }
 
+static VALUE rb_cnekqueue_clear(VALUE self) {
+  struct snake_queue *queue;
+  Data_Get_Struct(self, struct snake_queue, queue);
+
+  queue->length = 0;
+
+  return self;
+}
+
 void
 Init_cnek(void)
 {
@@ -179,6 +188,7 @@ Init_cnek(void)
   rb_define_method(rb_cCnekGrid, "add", rb_cnekqueue_add, 3);
   rb_define_method(rb_cCnekGrid, "each", rb_cnekqueue_each, 0);
   rb_define_method(rb_cCnekGrid, "empty?", rb_cnekqueue_empty, 0);
+  rb_define_method(rb_cCnekGrid, "clear", rb_cnekqueue_clear, 0);
   //rb_define_method(rb_cCnekGrid, "set_all", rb_cnekgrid_set_all, 2);
 
   rb_cCnekGrid = rb_define_class_under(rb_mCnek, "Grid", rb_cObject);

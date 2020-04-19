@@ -24,6 +24,7 @@ class BoardBFS
     width_1 = @board.width - 1
     height_1 = @board.height - 1
 
+    queue = Cnek::Queue.new(visited)
     next_queue = Cnek::Queue.new(visited)
 
     food.set_all(board.food, true)
@@ -43,8 +44,7 @@ class BoardBFS
 
     distance = 0
     until next_queue.empty?
-      queue = next_queue
-      next_queue = Cnek::Queue.new(visited)
+      queue, next_queue = next_queue, queue.clear
 
       queue.each do |x, y, snake|
         @tiles[snake] += 1
