@@ -25,9 +25,15 @@ static void mark_grid(struct snake_grid *grid) {
       rb_gc_mark(grid->values[i]);
 }
 
+static const rb_data_type_t grid_data_type = {
+    "Cnek::Grid",
+    {mark_grid, free_grid, NULL,},
+    0, 0, RUBY_TYPED_WB_PROTECTED | RUBY_TYPED_FREE_IMMEDIATELY
+};
+
 static VALUE allocate_grid(VALUE klass) {
   struct snake_grid *grid;
-  VALUE obj = Data_Make_Struct(klass, struct snake_grid, mark_grid, free_grid, grid);
+  VALUE obj = TypedData_Make_Struct(klass, struct snake_grid, &grid_data_type, grid);
 
   grid->width = grid->height = 0;
   grid->values = NULL;
@@ -37,7 +43,7 @@ static VALUE allocate_grid(VALUE klass) {
 
 static VALUE rb_cnekgrid_initialize(VALUE self, VALUE width, VALUE height) {
   struct snake_grid *grid;
-  Data_Get_Struct(self, struct snake_grid, grid);
+  TypedData_Get_Struct(self, struct snake_grid, &grid_data_type, grid);
 
   grid->width = NUM2UINT(width);
   grid->height = NUM2UINT(height);
@@ -54,7 +60,7 @@ static void grid_bounds_check(struct snake_grid *grid, unsigned int x, unsigned 
 
 static VALUE rb_cnekgrid_set(VALUE self, VALUE xval, VALUE yval, VALUE value) {
   struct snake_grid *grid;
-  Data_Get_Struct(self, struct snake_grid, grid);
+  TypedData_Get_Struct(self, struct snake_grid, &grid_data_type, grid);
 
   unsigned int x = FIX2INT(xval);
   unsigned int y = FIX2INT(yval);
@@ -77,7 +83,7 @@ static VALUE rb_cnekgrid_set_all(VALUE self, VALUE points, VALUE value) {
 
 static VALUE rb_cnekgrid_at(VALUE self, VALUE xval, VALUE yval) {
   struct snake_grid *grid;
-  Data_Get_Struct(self, struct snake_grid, grid);
+  TypedData_Get_Struct(self, struct snake_grid, &grid_data_type, grid);
 
   unsigned int x = FIX2INT(xval);
   unsigned int y = FIX2INT(yval);
@@ -109,9 +115,15 @@ static void mark_queue(struct snake_queue *queue) {
     rb_gc_mark(queue->entries[i].val);
 }
 
+static const rb_data_type_t queue_data_type = {
+    "Cnek::Queue",
+    {mark_queue, free, NULL,},
+    0, 0, RUBY_TYPED_WB_PROTECTED | RUBY_TYPED_FREE_IMMEDIATELY
+};
+
 static VALUE allocate_queue(VALUE klass) {
   struct snake_queue *queue;
-  VALUE obj = Data_Make_Struct(klass, struct snake_queue, mark_queue, free, queue);
+  VALUE obj = TypedData_Make_Struct(klass, struct snake_queue, &queue_data_type, queue);
 
   queue->length = 0;
   queue->visited_obj = Qnil;
@@ -122,10 +134,10 @@ static VALUE allocate_queue(VALUE klass) {
 
 static VALUE rb_cnekqueue_initialize(VALUE self, VALUE grid_value) {
   struct snake_queue *queue;
-  Data_Get_Struct(self, struct snake_queue, queue);
+  TypedData_Get_Struct(self, struct snake_queue, &queue_data_type, queue);
 
   struct snake_grid *grid;
-  Data_Get_Struct(grid_value, struct snake_grid, grid);
+  TypedData_Get_Struct(grid_value, struct snake_grid, &grid_data_type, grid);
 
   queue->visited_obj = grid_value;
   queue->visited = grid;
@@ -135,7 +147,7 @@ static VALUE rb_cnekqueue_initialize(VALUE self, VALUE grid_value) {
 
 static VALUE rb_cnekqueue_empty(VALUE self) {
   struct snake_queue *queue;
-  Data_Get_Struct(self, struct snake_queue, queue);
+  TypedData_Get_Struct(self, struct snake_queue, &queue_data_type, queue);
 
   return queue->length == 0 ? Qtrue : Qfalse;
 }
@@ -149,7 +161,7 @@ static void queue_add(struct snake_queue *queue, unsigned int x, unsigned int y,
 
 static VALUE rb_cnekqueue_add(VALUE self, VALUE x, VALUE y, VALUE val) {
   struct snake_queue *queue;
-  Data_Get_Struct(self, struct snake_queue, queue);
+  TypedData_Get_Struct(self, struct snake_queue, &queue_data_type, queue);
 
   if (queue->length >= QUEUE_MAX_LEN) {
     rb_raise(rb_eRuntimeError, "queue too big");
@@ -162,7 +174,7 @@ static VALUE rb_cnekqueue_add(VALUE self, VALUE x, VALUE y, VALUE val) {
 
 static VALUE rb_cnekqueue_add_neighbours(VALUE self, VALUE xval, VALUE yval, VALUE val) {
   struct snake_queue *queue;
-  Data_Get_Struct(self, struct snake_queue, queue);
+  TypedData_Get_Struct(self, struct snake_queue, &queue_data_type, queue);
   struct snake_grid *grid = queue->visited;
 
   if (queue->length + 4 > QUEUE_MAX_LEN) {
@@ -187,7 +199,7 @@ static VALUE rb_cnekqueue_add_neighbours(VALUE self, VALUE xval, VALUE yval, VAL
 
 static VALUE rb_cnekqueue_each(VALUE self) {
   struct snake_queue *queue;
-  Data_Get_Struct(self, struct snake_queue, queue);
+  TypedData_Get_Struct(self, struct snake_queue, &queue_data_type, queue);
   struct snake_grid *grid = queue->visited;
 
   for (int i = 0; i < queue->length; i++) {
@@ -210,7 +222,7 @@ static VALUE rb_cnekqueue_each(VALUE self) {
 
 static VALUE rb_cnekqueue_clear(VALUE self) {
   struct snake_queue *queue;
-  Data_Get_Struct(self, struct snake_queue, queue);
+  TypedData_Get_Struct(self, struct snake_queue, &queue_data_type, queue);
 
   queue->length = 0;
 
