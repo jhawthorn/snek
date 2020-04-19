@@ -5,6 +5,8 @@ VALUE rb_cCnekGrid;
 
 static VALUE i_x, i_y;
 
+/* Cnek::Grid */
+
 struct snake_grid {
   unsigned int width;
   unsigned int height;
@@ -14,6 +16,9 @@ struct snake_grid {
 static VALUE allocate_grid(VALUE klass) {
   struct snake_grid *grid;
   VALUE obj = Data_Make_Struct(klass, struct snake_grid, NULL, NULL, grid);
+
+  grid->width = grid->height = 0;
+  grid->values = NULL;
 
   return obj;
 }
@@ -29,7 +34,7 @@ static VALUE rb_cnekgrid_initialize(VALUE self, VALUE width, VALUE height) {
   return Qnil;
 }
 
-static void grid_bounds_check(struct snake_grid *grid, int x, int y) {
+static void grid_bounds_check(struct snake_grid *grid, unsigned int x, unsigned int y) {
   if (x >= grid->width || y >= grid->height) {
     rb_raise(rb_eArgError, "point out of range");
   }
@@ -50,9 +55,6 @@ static VALUE rb_cnekgrid_set(VALUE self, VALUE xval, VALUE yval, VALUE value) {
 }
 
 static VALUE rb_cnekgrid_set_all(VALUE self, VALUE points, VALUE value) {
-  struct snake_grid *grid;
-  Data_Get_Struct(self, struct snake_grid, grid);
-
   for (unsigned int i = 0; i < RARRAY_LEN(points); i++) {
     VALUE point = RARRAY_AREF(points, i);
     VALUE x = rb_funcall(point, i_x, 0);
@@ -73,6 +75,82 @@ static VALUE rb_cnekgrid_at(VALUE self, VALUE xval, VALUE yval) {
   return grid->values[y * grid->width + x];
 }
 
+/* Cnek::Queue */
+
+#define QUEUE_MAX_LEN 1024
+struct snake_queue {
+  VALUE visited_obj;
+  struct snake_grid *visited;
+
+  int length;
+  struct {
+    unsigned int x;
+    unsigned int y;
+    VALUE val;
+  } entries[QUEUE_MAX_LEN];
+};
+
+static VALUE allocate_queue(VALUE klass) {
+  struct snake_queue *queue;
+  VALUE obj = Data_Make_Struct(klass, struct snake_queue, NULL, NULL, queue);
+
+  queue->length = 0;
+  queue->visited_obj = Qnil;
+  queue->visited = NULL;
+
+  return obj;
+}
+
+static VALUE rb_cnekqueue_initialize(VALUE self, VALUE grid_value) {
+  struct snake_queue *queue;
+  Data_Get_Struct(self, struct snake_queue, queue);
+
+  struct snake_grid *grid;
+  Data_Get_Struct(grid_value, struct snake_grid, grid);
+
+  queue->visited_obj = grid_value;
+  queue->visited = grid;
+
+  return Qnil;
+}
+
+static VALUE rb_cnekqueue_empty(VALUE self) {
+  struct snake_queue *queue;
+  Data_Get_Struct(self, struct snake_queue, queue);
+
+  return queue->length == 0 ? Qtrue : Qfalse;
+}
+
+static VALUE rb_cnekqueue_add(VALUE self, VALUE x, VALUE y, VALUE val) {
+  struct snake_queue *queue;
+  Data_Get_Struct(self, struct snake_queue, queue);
+
+  if (queue->length >= QUEUE_MAX_LEN) {
+    rb_raise(rb_eRuntimeError, "queue too big");
+  }
+
+  queue->entries[queue->length].x = FIX2UINT(x);
+  queue->entries[queue->length].y = FIX2UINT(y);
+  queue->entries[queue->length].val = val;
+  queue->length++;
+
+  return Qnil;
+}
+
+static VALUE rb_cnekqueue_each(VALUE self) {
+  struct snake_queue *queue;
+  Data_Get_Struct(self, struct snake_queue, queue);
+
+  for (int i = 0; i < queue->length; i++) {
+    rb_yield_values(3,
+        INT2FIX(queue->entries[i].x),
+        INT2FIX(queue->entries[i].y),
+        queue->entries[i].val);
+  }
+
+  return self;
+}
+
 void
 Init_cnek(void)
 {
@@ -81,6 +159,14 @@ Init_cnek(void)
 
   rb_mCnek = rb_define_module("Cnek");
   //rb_define_singleton_method(mod, "calculate_bfs", rb_cnek_calculate_bfs, 1);
+
+  rb_cCnekGrid = rb_define_class_under(rb_mCnek, "Queue", rb_cObject);
+  rb_define_alloc_func(rb_cCnekGrid, allocate_queue);
+  rb_define_method(rb_cCnekGrid, "initialize", rb_cnekqueue_initialize, 1);
+  rb_define_method(rb_cCnekGrid, "add", rb_cnekqueue_add, 3);
+  rb_define_method(rb_cCnekGrid, "each", rb_cnekqueue_each, 0);
+  rb_define_method(rb_cCnekGrid, "empty?", rb_cnekqueue_empty, 0);
+  //rb_define_method(rb_cCnekGrid, "set_all", rb_cnekgrid_set_all, 2);
 
   rb_cCnekGrid = rb_define_class_under(rb_mCnek, "Grid", rb_cObject);
   rb_define_alloc_func(rb_cCnekGrid, allocate_grid);

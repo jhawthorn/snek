@@ -24,7 +24,7 @@ class BoardBFS
     width_1 = @board.width - 1
     height_1 = @board.height - 1
 
-    next_queue = []
+    next_queue = Cnek::Queue.new(visited)
 
     food.set_all(board.food, true)
 
@@ -37,14 +37,14 @@ class BoardBFS
 
     @targets.sort_by(&:length).reverse_each do |snake|
       unless board.out_of_bounds?(snake.head)
-        next_queue << [snake.head.x, snake.head.y, snake]
+        next_queue.add(snake.head.x, snake.head.y, snake)
       end
     end
 
     distance = 0
     until next_queue.empty?
       queue = next_queue
-      next_queue = []
+      next_queue = Cnek::Queue.new(visited)
 
       queue.each do |x, y, snake|
         next if visited.at(x,y)
@@ -56,10 +56,10 @@ class BoardBFS
           @distance_to_food[snake] ||= distance
         end
 
-        next_queue << [x+1, y, snake] if x < width_1
-        next_queue << [x-1, y, snake] if x > 0
-        next_queue << [x, y+1, snake] if y < height_1
-        next_queue << [x, y-1, snake] if y > 0
+        next_queue.add(x+1, y, snake) if x < width_1
+        next_queue.add(x-1, y, snake) if x > 0
+        next_queue.add(x, y+1, snake) if y < height_1
+        next_queue.add(x, y-1, snake) if y > 0
       end
 
       @snakes.each do |snake|
