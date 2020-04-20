@@ -20,8 +20,9 @@ class Game
   end
 
   def initialize_copy(other)
-    super(other)
     @board = @board.dup
+    @player = nil
+    @enemies = nil
   end
 
   def snakes
@@ -29,11 +30,11 @@ class Game
   end
 
   def player
-    snakes.detect { |s| s.id == @self_id }
+    @player ||= snakes.detect { |s| s.id == @self_id }
   end
 
   def enemies
-    snakes - [player]
+    @enemies ||= snakes - [player]
   end
 
   def simulate(actions)
