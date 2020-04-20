@@ -27,11 +27,11 @@ class Point
   end
 
   def ==(other)
-    x == other.x && y == other.y
+    @x == other.x && @y == other.y
   end
 
   def eql?(other)
-    x == other.x && y == other.y
+    @x == other.x && @y == other.y
   end
 
   def to_a
@@ -39,7 +39,7 @@ class Point
   end
 
   def hash
-    to_a.hash
+    (@y << 16) | @x
   end
 
   def inspect
