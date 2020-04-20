@@ -16,7 +16,7 @@ struct snake_grid {
 static void free_grid(struct snake_grid *grid) {
   if (grid->values)
     xfree(grid->values);
-  free(grid);
+  xfree(grid);
 }
 
 static void mark_grid(struct snake_grid *grid) {
@@ -117,7 +117,7 @@ static void mark_queue(struct snake_queue *queue) {
 
 static const rb_data_type_t queue_data_type = {
     "Cnek::Queue",
-    {mark_queue, free, NULL,},
+    {mark_queue, RUBY_TYPED_DEFAULT_FREE, NULL,},
     0, 0, RUBY_TYPED_WB_PROTECTED | RUBY_TYPED_FREE_IMMEDIATELY
 };
 
