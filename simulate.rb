@@ -1,7 +1,7 @@
 require './config/environment'
 
 CARDINALITY = MlScorer::CARDINALITY
-MUTATION_RATE = 0.05
+MUTATION_RATE = 0.10
 N_PROC=16
 
 def random_weights
@@ -64,7 +64,7 @@ def eliminate(initial_pop, desired)
 
   wins = Hash.new(0)
 
-  matches = 32.times.flat_map { pop.shuffle.each_slice(4).to_a }
+  matches = 64.times.flat_map { pop.shuffle.each_slice(4).to_a }
   Parallel.map(matches, in_processes: N_PROC, progress: "Simulating") do |(a, b)|
     winner, _loser = winner_losers_from(a, b)
 
@@ -100,7 +100,7 @@ def reproduce(initial_pop, desired)
 end
 
 i = 0
-POP = 64
+POP = 128
 ADVANCE = 8
 pop = new_population(POP)
 
@@ -109,15 +109,15 @@ ROUNDS.times do
   puts "Round #{i}"
   i += 1
   pop = eliminate(pop, ADVANCE)
+  best = pop[0]
 
-  puts "best:"
-  p pop[0]
-  puts
+  puts "best: #{best.inspect}"
+  File.write("tmp/best_snake.rb", best.inspect)
 
   # Show one round for fun
   winner, _ = winner_losers_from(*pop.sample(4), verbose: true)
   puts "vs. hand tuned scorer..."
-  winner, _= winner_losers_from(winner, nil)
+  winner, _= winner_losers_from(best, nil)
   puts winner.nil? ? "  lost" : "  won"
 
   pop = reproduce(pop, POP)
