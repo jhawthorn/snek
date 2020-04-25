@@ -211,10 +211,10 @@ static VALUE rb_cnekqueue_each(VALUE self) {
     unsigned int x = queue->entries[i].x;
     unsigned int y = queue->entries[i].y;
 
-    if (GRID_VALUE(grid, y, x)) {
+    if (GRID_VALUE(grid, x, y)) {
       continue;
     }
-    GRID_VALUE(grid, y, x) = Qtrue;
+    GRID_VALUE(grid, x, y) = Qtrue;
 
     rb_yield_values(3,
         INT2FIX(x),
