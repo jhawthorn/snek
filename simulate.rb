@@ -4,8 +4,12 @@ CARDINALITY = MlScorer::CARDINALITY
 MUTATION_RATE = 0.10
 N_PROC=16
 
+def random_weight
+  (rand - 0.5).round(3)
+end
+
 def random_weights
-  Array.new(CARDINALITY) { rand - 0.5 }
+  Array.new(CARDINALITY) { random_weight }
 end
 
 def new_population(n)
@@ -52,7 +56,7 @@ end
 def mutate(weights)
   weights.map do |original|
     if rand < MUTATION_RATE
-      rand - 0.5
+      random_weight
     else
       original
     end
@@ -85,18 +89,19 @@ def reproduce(initial_pop, desired)
     while pop.size < desired
       a, b = initial_pop.sample(2)
       child = a.zip(b).map(&:sample)
-      pop << child
+      pop << mutate(child)
     end
 
     # normalize
-    pop.map! { |x| x.map { |y| y.round(2) } }
+    #pop.map! { |x| x.map { |y| y.round(3) } }
 
     pop.uniq!
   end
 
-  pop.map do |member|
-    mutate(member)
-  end
+  #pop.map do |member|
+  #  mutate(member)
+  #end
+  pop
 end
 
 i = 0
@@ -113,11 +118,13 @@ ROUNDS.times do
 
   puts "best: #{best.inspect}"
   File.write("tmp/best_snake.rb", best.inspect)
+  FileUtils.mkdir_p 'tmp/population'
+  File.write("tmp/population/#{Time.now.strftime("%F-%H-%M-%S")}-#{i}.rb", best.inspect)
 
   # Show one round for fun
-  winner, _ = winner_losers_from(*pop.sample(4), verbose: true)
+  #winner, _ = winner_losers_from(*pop.sample(4), verbose: true)
   puts "vs. hand tuned scorer..."
-  winner, _= winner_losers_from(best, nil)
+  winner, _= winner_losers_from(best, nil, verbose: true)
   puts winner.nil? ? "  lost" : "  won"
 
   pop = reproduce(pop, POP)
