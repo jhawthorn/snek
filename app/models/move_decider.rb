@@ -45,7 +45,7 @@ class MoveDecider
   class Possibility
     attr_reader :initial_game, :moves, :game, :scorer
 
-    def initialize(initial_game, moves, scorer)
+    def initialize(initial_game, moves, scorer:)
       @initial_game = initial_game
       @moves = moves
       @game = @initial_game.simulate(moves)
@@ -66,11 +66,10 @@ class MoveDecider
     end
   end
 
-  def possible_futures
-    @possible_futures ||=
-      all_move_combinations.map do |moves|
-        Possibility.new(@game, moves, @scorer_builder)
-      end
+  def possible_futures(game: @game)
+    all_move_combinations.map do |moves|
+      Possibility.new(@game, moves, scorer: @scorer_builder)
+    end
   end
 
   def move_scores
