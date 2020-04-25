@@ -5,7 +5,7 @@ class Board
     @width = width
     @height = height
     @snakes = snakes
-    @food = food
+    @food = Set.new(food)
   end
 
   def self.from_json(data)
@@ -21,7 +21,7 @@ class Board
     super(other)
 
     @snakes = @snakes.map(&:dup)
-    @food = @food.map(&:dup)
+    @food = @food.dup
   end
 
   def new_grid(default: nil)
