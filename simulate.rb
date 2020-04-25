@@ -1,7 +1,7 @@
 require './config/environment'
 
 CARDINALITY = MlScorer::CARDINALITY
-MUTATION_RATE = 0.10
+MUTATION_RATE = 0.05
 N_PROC=16
 
 def random_weight
@@ -68,7 +68,7 @@ def eliminate(initial_pop, desired)
 
   wins = Hash.new(0)
 
-  matches = 64.times.flat_map { pop.shuffle.each_slice(4).to_a }
+  matches = 256.times.flat_map { pop.shuffle.each_slice(4).to_a }
   Parallel.map(matches, in_processes: N_PROC, progress: "Simulating") do |(a, b)|
     winner, _loser = winner_losers_from(a, b)
 
@@ -106,10 +106,12 @@ end
 
 i = 0
 POP = 128
-ADVANCE = 8
-pop = new_population(POP)
+ADVANCE = 16
+pop = eval(File.read("tmp/population.rb"))
+#pop = new_population(POP)
+pop = reproduce(pop, POP)
 
-ROUNDS = 100
+ROUNDS = 20
 ROUNDS.times do
   puts "Round #{i}"
   i += 1
@@ -118,8 +120,10 @@ ROUNDS.times do
 
   puts "best: #{best.inspect}"
   File.write("tmp/best_snake.rb", best.inspect)
+  File.write("tmp/population.rb", pop.inspect)
   FileUtils.mkdir_p 'tmp/population'
-  File.write("tmp/population/#{Time.now.strftime("%F-%H-%M-%S")}-#{i}.rb", best.inspect)
+  File.write("tmp/population/best-#{Time.now.strftime("%F-%H-%M-%S")}-#{i}.rb", best.inspect)
+  File.write("tmp/population/pop-#{Time.now.strftime("%F-%H-%M-%S")}-#{i}.rb", pop.inspect)
 
   # Show one round for fun
   #winner, _ = winner_losers_from(*pop.sample(4), verbose: true)
