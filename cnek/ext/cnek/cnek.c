@@ -78,6 +78,10 @@ static VALUE rb_cnekgrid_set(VALUE self, VALUE xval, VALUE yval, VALUE value) {
 }
 
 static VALUE rb_cnekgrid_set_all(VALUE self, VALUE points, VALUE value) {
+  if (!RB_TYPE_P(points, T_ARRAY)) {
+      rb_raise(rb_eArgError, "points must be an array");
+  }
+
   for (unsigned int i = 0; i < RARRAY_LEN(points); i++) {
     VALUE point = RARRAY_AREF(points, i);
     VALUE x = rb_funcall(point, i_x, 0);

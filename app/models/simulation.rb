@@ -109,7 +109,7 @@ class Simulation
     food -= @board.snakes.flat_map(&:body)
     food -= existing
 
-    @board.food.concat food
+    @board.food.merge food
   end
 
   def over?
