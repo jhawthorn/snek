@@ -110,12 +110,27 @@ ADVANCE = 16
 pop = eval(File.read("tmp/population.rb"))
 #pop = new_population(POP)
 pop = reproduce(pop, POP)
+ROUNDS_VS_TUNED = 100
+
+def test_vs_hand_tuned(best)
+  puts "Testing against hand tuned scorer"
+  wins = Parallel.map(ROUNDS_VS_TUNED.times, in_processes: N_PROC, progress: "Simulating") do |seed|
+    Kernel.srand
+
+    !!winner_losers_from(best, nil)[0]
+  end.count(true)
+  losses = ROUNDS_VS_TUNED - wins
+
+  puts "  wins: #{wins}, losses: #{losses}"
+end
 
 ROUNDS = 20
 ROUNDS.times do
   puts "Round #{i}"
   i += 1
-  pop = eliminate(pop, ADVANCE)
+  pop = eliminate(pop, 64)
+  pop = eliminate(pop, 32)
+  pop = eliminate(pop, 16)
   best = pop[0]
 
   puts "best: #{best.inspect}"
@@ -127,23 +142,16 @@ ROUNDS.times do
 
   # Show one round for fun
   #winner, _ = winner_losers_from(*pop.sample(4), verbose: true)
-  puts "vs. hand tuned scorer..."
-  winner, _= winner_losers_from(best, nil, verbose: true)
-  puts winner.nil? ? "  lost" : "  won"
+  #puts "vs. hand tuned scorer..."
+  #winner, _= winner_losers_from(best, nil, verbose: true)
+  #puts winner.nil? ? "  lost" : "  won"
+
+  test_vs_hand_tuned(best)
 
   pop = reproduce(pop, POP)
 end
 best = eliminate(pop, 1)[0]
 puts "best: #{best.inspect}"
 puts
-puts "Testing against hand tuned scorer"
 
-ROUNDS_VS_TUNED = 100
-wins = Parallel.map(ROUNDS_VS_TUNED.times, in_processes: N_PROC, progress: "Simulating") do |seed|
-  Kernel.srand
-
-  !!winner_losers_from(best, nil)[0]
-end.count(true)
-losses = ROUNDS_VS_TUNED - wins
-
-puts "  wins: #{wins}, losses: #{losses}"
+test_vs_hand_tuned(best)
