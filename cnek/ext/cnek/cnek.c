@@ -4,6 +4,7 @@ VALUE rb_mCnek;
 VALUE rb_cCnekGrid;
 
 static VALUE i_x, i_y;
+static VALUE idTo_ary;
 
 /* Cnek::Grid */
 
@@ -109,6 +110,9 @@ struct snake_queue {
   VALUE visited_obj;
   struct snake_grid *visited;
 
+  VALUE food_obj;
+  struct snake_grid *food;
+
   int length;
   struct {
     unsigned int x;
@@ -119,6 +123,7 @@ struct snake_queue {
 
 static void mark_queue(struct snake_queue *queue) {
   rb_gc_mark(queue->visited_obj);
+  rb_gc_mark(queue->food_obj);
 
   for (int i = 0; i < queue->length; i++)
     rb_gc_mark(queue->entries[i].val);
@@ -141,15 +146,17 @@ static VALUE allocate_queue(VALUE klass) {
   return obj;
 }
 
-static VALUE rb_cnekqueue_initialize(VALUE self, VALUE grid_value) {
+static VALUE rb_cnekqueue_initialize(VALUE self, VALUE visited_value, VALUE food_value) {
   struct snake_queue *queue;
   TypedData_Get_Struct(self, struct snake_queue, &queue_data_type, queue);
 
   struct snake_grid *grid;
-  TypedData_Get_Struct(grid_value, struct snake_grid, &grid_data_type, grid);
 
-  queue->visited_obj = grid_value;
-  queue->visited = grid;
+  queue->visited_obj = visited_value;
+  TypedData_Get_Struct(visited_value, struct snake_grid, &grid_data_type, queue->visited);
+
+  queue->food_obj = food_value;
+  TypedData_Get_Struct(food_value, struct snake_grid, &grid_data_type, queue->food);
 
   return Qnil;
 }
@@ -184,7 +191,7 @@ static VALUE rb_cnekqueue_add(VALUE self, VALUE x, VALUE y, VALUE val) {
 static VALUE rb_cnekqueue_add_neighbours(VALUE self, VALUE xval, VALUE yval, VALUE val) {
   struct snake_queue *queue;
   TypedData_Get_Struct(self, struct snake_queue, &queue_data_type, queue);
-  struct snake_grid *grid = queue->visited;
+  struct snake_grid *visited = queue->visited;
 
   if (queue->length + 4 > QUEUE_MAX_LEN) {
     rb_raise(rb_eRuntimeError, "queue too big");
@@ -194,11 +201,11 @@ static VALUE rb_cnekqueue_add_neighbours(VALUE self, VALUE xval, VALUE yval, VAL
   unsigned int y = FIX2INT(yval);
 
 
-  if (x < grid->width - 1)
+  if (x < visited->width - 1)
     queue_add(queue, x+1, y, val);
   if (x > 0)
     queue_add(queue, x-1, y, val);
-  if (y < grid->height - 1)
+  if (y < visited->height - 1)
     queue_add(queue, x, y+1, val);
   if (y > 0)
     queue_add(queue, x, y-1, val);
@@ -209,21 +216,24 @@ static VALUE rb_cnekqueue_add_neighbours(VALUE self, VALUE xval, VALUE yval, VAL
 static VALUE rb_cnekqueue_each(VALUE self) {
   struct snake_queue *queue;
   TypedData_Get_Struct(self, struct snake_queue, &queue_data_type, queue);
-  struct snake_grid *grid = queue->visited;
+  struct snake_grid *visited = queue->visited;
+  struct snake_grid *food = queue->food;
 
   for (int i = 0; i < queue->length; i++) {
     unsigned int x = queue->entries[i].x;
     unsigned int y = queue->entries[i].y;
 
-    if (GRID_VALUE(grid, x, y)) {
+    if (GRID_VALUE(visited, x, y)) {
       continue;
     }
-    GRID_VALUE(grid, x, y) = Qtrue;
+    GRID_VALUE(visited, x, y) = Qtrue;
 
-    rb_yield_values(3,
+    rb_yield_values(4,
         INT2FIX(x),
         INT2FIX(y),
-        queue->entries[i].val);
+        queue->entries[i].val,
+        GRID_VALUE(food, x, y)
+	);
   }
 
   return self;
@@ -243,12 +253,13 @@ Init_cnek(void)
 {
   i_x = rb_intern("x");
   i_y = rb_intern("y");
+  idTo_ary = rb_intern("to_ary");
 
   rb_mCnek = rb_define_module("Cnek");
 
   rb_cCnekGrid = rb_define_class_under(rb_mCnek, "Queue", rb_cObject);
   rb_define_alloc_func(rb_cCnekGrid, allocate_queue);
-  rb_define_method(rb_cCnekGrid, "initialize", rb_cnekqueue_initialize, 1);
+  rb_define_method(rb_cCnekGrid, "initialize", rb_cnekqueue_initialize, 2);
   rb_define_method(rb_cCnekGrid, "add", rb_cnekqueue_add, 3);
   rb_define_method(rb_cCnekGrid, "add_neighbours", rb_cnekqueue_add_neighbours, 3);
   rb_define_method(rb_cCnekGrid, "each", rb_cnekqueue_each, 0);

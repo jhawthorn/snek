@@ -24,10 +24,10 @@ class BoardBFS
     width_1 = @board.width - 1
     height_1 = @board.height - 1
 
-    queue = Cnek::Queue.new(visited)
-    next_queue = Cnek::Queue.new(visited)
+    queue = Cnek::Queue.new(visited, food)
+    next_queue = Cnek::Queue.new(visited, food)
 
-    food.set_all(board.food, true)
+    food.set_all(board.food.to_a, true)
 
     @targets.each do |snake|
       visited.set_all(snake.tail, true)
@@ -48,10 +48,10 @@ class BoardBFS
     until next_queue.empty?
       queue, next_queue = next_queue, queue.clear
 
-      queue.each do |x, y, snake|
+      queue.each do |x, y, snake, has_food|
         @tiles[snake] += 1
 
-        if food.at(x,y)
+        if has_food
           @distance_to_food[snake] ||= distance
         end
 
