@@ -95,10 +95,8 @@ class MoveDecider
   end
 
   def all_move_combinations(possible_moves = reasonable_moves)
-    return enum_for(__method__, possible_moves) unless block_given?
-
     if possible_moves.empty?
-      return yield({})
+      return [{}]
     end
 
     snake_id = possible_moves.keys.first
@@ -106,9 +104,11 @@ class MoveDecider
     remaining_moves = possible_moves.dup
     my_moves = remaining_moves.delete(snake_id)
 
-    my_moves.each do |my_move|
-      all_move_combinations(remaining_moves) do |other_moves|
-        yield({ snake_id => my_move }.merge(other_moves))
+    other_combinations = all_move_combinations(remaining_moves)
+
+    my_moves.flat_map do |my_move|
+      other_combinations.map do |other_moves|
+        { snake_id => my_move }.update(other_moves)
       end
     end
   end
