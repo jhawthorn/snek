@@ -9,9 +9,12 @@ static VALUE i_x, i_y;
 
 struct snake_grid {
   unsigned int width;
+  unsigned int shiftwidth;
   unsigned int height;
   VALUE *values;
 };
+
+#define GRID_VALUE(grid, x, y) (grid->values[(y << grid->shiftwidth) | x])
 
 static void free_grid(struct snake_grid *grid) {
   if (grid->values)
@@ -21,7 +24,7 @@ static void free_grid(struct snake_grid *grid) {
 
 static void mark_grid(struct snake_grid *grid) {
   if (grid->values)
-    for (unsigned int i = 0; i < grid->width * grid->height; i++)
+    for (unsigned int i = 0; i < (grid->height << grid->shiftwidth); i++)
       rb_gc_mark(grid->values[i]);
 }
 
@@ -35,7 +38,7 @@ static VALUE allocate_grid(VALUE klass) {
   struct snake_grid *grid;
   VALUE obj = TypedData_Make_Struct(klass, struct snake_grid, &grid_data_type, grid);
 
-  grid->width = grid->height = 0;
+  grid->shiftwidth = grid->width = grid->height = 0;
   grid->values = NULL;
 
   return obj;
@@ -46,8 +49,10 @@ static VALUE rb_cnekgrid_initialize(VALUE self, VALUE width, VALUE height) {
   TypedData_Get_Struct(self, struct snake_grid, &grid_data_type, grid);
 
   grid->width = NUM2UINT(width);
+  for (grid->shiftwidth = 0; (1 << grid->shiftwidth) < grid->width; grid->shiftwidth++)
+	  ;
   grid->height = NUM2UINT(height);
-  grid->values = xcalloc(grid->width * grid->height, sizeof(VALUE));
+  grid->values = xcalloc((grid->height << grid->shiftwidth), sizeof(VALUE));
 
   return Qnil;
 }
@@ -67,7 +72,7 @@ static VALUE rb_cnekgrid_set(VALUE self, VALUE xval, VALUE yval, VALUE value) {
 
   grid_bounds_check(grid, x, y);
 
-  grid->values[y * grid->width + x] = value;
+  GRID_VALUE(grid, x, y) = value;
 
   return value;
 }
@@ -85,12 +90,12 @@ static VALUE rb_cnekgrid_at(VALUE self, VALUE xval, VALUE yval) {
   struct snake_grid *grid;
   TypedData_Get_Struct(self, struct snake_grid, &grid_data_type, grid);
 
-  unsigned int x = FIX2INT(xval);
-  unsigned int y = FIX2INT(yval);
+  unsigned int x = (xval) >> 1;
+  unsigned int y = (yval) >> 1;
 
   grid_bounds_check(grid, x, y);
 
-  return grid->values[y * grid->width + x];
+  return GRID_VALUE(grid, x, y);
 }
 
 /* Cnek::Queue */
@@ -206,10 +211,10 @@ static VALUE rb_cnekqueue_each(VALUE self) {
     unsigned int x = queue->entries[i].x;
     unsigned int y = queue->entries[i].y;
 
-    if (grid->values[y * grid->width + x]) {
+    if (GRID_VALUE(grid, y, x)) {
       continue;
     }
-    grid->values[y * grid->width + x] = Qtrue;
+    GRID_VALUE(grid, y, x) = Qtrue;
 
     rb_yield_values(3,
         INT2FIX(x),
