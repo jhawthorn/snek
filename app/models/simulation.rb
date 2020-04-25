@@ -96,7 +96,7 @@ class Simulation
   end
 
   def spawn_food!
-    existing = @board.snakes.select(&:alive?).map(&:body).inject([], :+) + @board.food
+    existing = @board.snakes.select(&:alive?).map(&:body).inject([], :+) + @board.food.to_a
     x = rand(width)
     y = rand(height)
 
