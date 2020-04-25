@@ -85,7 +85,8 @@ class MoveDecider
           possibility.player_move == action
         end
 
-      [action, relevant.map(&:score).min]
+      possible_scores = relevant.map(&:score)
+      [action, [possible_scores.min, possible_scores.sum/possible_scores.size]]
     end
   end
 
