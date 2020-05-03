@@ -142,4 +142,11 @@ class DecisionTest < ActiveSupport::TestCase
     move =  MoveDecider.new(game).next_move
     assert_equal :down, move
   end
+
+  def test_battlesnake_2020_stay_home_and_code_loss
+    game = game_fixture("input-2da76c63-49db-481b-8e71-8d5349f4a451-turn-395.json")
+    decider = MoveDecider.new(game)
+    move = decider.next_move
+    assert_equal :right, move
+  end
 end

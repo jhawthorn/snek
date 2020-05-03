@@ -39,6 +39,7 @@ class GameScorer
 
     player_voronoi = @bfs.tiles[player]
     player_reachable = @reachable_bfs.tiles[player]
+    player_reachable = 10 if player_reachable > 10
 
     {
       length: 25 * player.length,

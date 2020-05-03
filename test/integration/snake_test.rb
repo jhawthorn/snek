@@ -111,6 +111,12 @@ class SnakeTest < ActionDispatch::IntegrationTest
     JSON
   end
 
+  def test_2020_stay_home_and_code_loss
+    assert_move_from_payload :right, <<-JSON
+    {"game":{"id":"2da76c63-49db-481b-8e71-8d5349f4a451"},"turn":395,"board":{"height":11,"width":11,"food":[{"x":10,"y":0},{"x":9,"y":10},{"x":3,"y":3},{"x":10,"y":3},{"x":9,"y":4}],"snakes":[{"id":"gs_yYRmpBTSxcRHSKVc6348FyFV","name":"Samaritan","health":91,"body":[{"x":4,"y":5},{"x":5,"y":5},{"x":6,"y":5},{"x":6,"y":6},{"x":5,"y":6},{"x":5,"y":7},{"x":5,"y":8},{"x":5,"y":9},{"x":6,"y":9},{"x":7,"y":9},{"x":7,"y":8},{"x":7,"y":7},{"x":8,"y":7},{"x":9,"y":7},{"x":10,"y":7},{"x":10,"y":6},{"x":9,"y":6},{"x":9,"y":5},{"x":8,"y":5},{"x":8,"y":4},{"x":8,"y":3},{"x":8,"y":2},{"x":7,"y":2},{"x":6,"y":2},{"x":6,"y":3},{"x":7,"y":3},{"x":7,"y":4},{"x":6,"y":4},{"x":5,"y":4},{"x":4,"y":4},{"x":3,"y":4},{"x":2,"y":4},{"x":2,"y":5},{"x":2,"y":6},{"x":3,"y":6}],"shout":""},{"id":"gs_hmxCfFCWqtdYPmQcJb3jCJqX","name":"jhawthorn","health":95,"body":[{"x":2,"y":3},{"x":2,"y":2},{"x":2,"y":1},{"x":2,"y":0},{"x":1,"y":0},{"x":0,"y":0},{"x":0,"y":1},{"x":1,"y":1},{"x":1,"y":2},{"x":0,"y":2},{"x":0,"y":3},{"x":0,"y":4},{"x":0,"y":5},{"x":0,"y":6},{"x":0,"y":7},{"x":0,"y":8},{"x":1,"y":8},{"x":1,"y":9}],"shout":""}]},"you":{"id":"gs_hmxCfFCWqtdYPmQcJb3jCJqX","name":"jhawthorn","health":95,"body":[{"x":2,"y":3},{"x":2,"y":2},{"x":2,"y":1},{"x":2,"y":0},{"x":1,"y":0},{"x":0,"y":0},{"x":0,"y":1},{"x":1,"y":1},{"x":1,"y":2},{"x":0,"y":2},{"x":0,"y":3},{"x":0,"y":4},{"x":0,"y":5},{"x":0,"y":6},{"x":0,"y":7},{"x":0,"y":8},{"x":1,"y":8},{"x":1,"y":9}],"shout":""}}
+    JSON
+  end
+
   def test_creates_db_records
     start_payload = { "game" => { "id" => "game-id-string" } }
     post '/start', params: start_payload, as: :json
