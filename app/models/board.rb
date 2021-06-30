@@ -74,7 +74,7 @@ class Board
     end
 
     heads = snakes.group_by(&:head)
-    walls = Cnek::Grid.new(width, height)
+    walls = Grid.new(width, height)
     snakes.each do |snake|
       walls.set_all(snake.tail, true)
     end

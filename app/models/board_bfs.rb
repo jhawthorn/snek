@@ -18,16 +18,16 @@ class BoardBFS
   end
 
   def calculate
-    visited = Cnek::Grid.new(board.width, board.height)
-    food = Cnek::Grid.new(board.width, board.height)
+    visited = Grid.new(board.width, board.height)
+    food = Grid.new(board.width, board.height)
 
     width_1 = @board.width - 1
     height_1 = @board.height - 1
 
-    queue = Cnek::Queue.new(visited, food)
-    next_queue = Cnek::Queue.new(visited, food)
+    queue = []
+    next_queue = []
 
-    food.set_all(board.food.to_a, true)
+    food.set_all(board.food, true)
 
     @targets.each do |snake|
       visited.set_all(snake.tail, true)
@@ -40,7 +40,7 @@ class BoardBFS
 
     @targets.each do |snake|
       unless board.out_of_bounds?(snake.head)
-        next_queue.add(snake.head.x, snake.head.y, snake)
+        next_queue << [snake.head.x, snake.head.y, snake]
       end
     end
 
@@ -48,14 +48,20 @@ class BoardBFS
     until next_queue.empty?
       queue, next_queue = next_queue, queue.clear
 
-      queue.each do |x, y, snake, has_food|
+      queue.each do |x, y, snake|
+        next if visited.at(x,y)
+        visited.set(x, y, true)
+
         @tiles[snake] += 1
 
-        if has_food
+        if food.at(x,y)
           @distance_to_food[snake] ||= distance
         end
 
-        next_queue.add_neighbours(x, y, snake)
+        next_queue << [x+1, y, snake] if x < width_1
+        next_queue << [x-1, y, snake] if x > 0
+        next_queue << [x, y+1, snake] if y < height_1
+        next_queue << [x, y-1, snake] if y > 0
       end
 
       @snakes.each do |snake|
