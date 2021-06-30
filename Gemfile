@@ -1,9 +1,7 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby '3.0.0'
-
-gem "cnek"
+gem "cnek", path: "./cnek"
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '~> 6.0'
@@ -30,6 +28,8 @@ gem 'bootsnap', '>= 1.4.2', require: false
 
 gem 'kaminari'
 gem 'barnes'
+
+gem 'psych', '~> 3.0'
 
 group :production do
   gem 'pg'
