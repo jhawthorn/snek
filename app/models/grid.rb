@@ -26,8 +26,13 @@ class Grid
   end
 
   def set_all(points, value)
-    points.each do |point|
+    i = 0
+    points = points.to_a
+    n = points.length
+    while i < n
+      point = points[i]
       self.set(point.x, point.y, value)
+      i += 1
     end
   end
 

@@ -29,7 +29,7 @@ class Snake
   end
 
   def alive?
-    health > 0
+    @health > 0
   end
 
   def head
@@ -37,7 +37,12 @@ class Snake
   end
 
   def tail
-    @body.drop_while { |x| x == head }
+    head = self.head
+    i = 1
+    while (segment = @body[i]) && segment == head
+      i += 1
+    end
+    @body[i, @body.size]
   end
 
   def length

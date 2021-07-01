@@ -15,7 +15,7 @@ class MoveDecider
   end
 
   def considered_snakes
-    return @snakes if @snakes.count <= 4
+    return @snakes if @snakes.size <= 4
 
     player = @game.player
 

@@ -1,10 +1,12 @@
 class Board
   attr_reader :snakes, :width, :height, :food
+  attr_reader :living_snakes
 
   def initialize(width: 11, height: width, snakes: [], food: [])
     @width = width
     @height = height
     @snakes = snakes
+    @living_snakes = snakes.select(&:alive?)
     @food = Set.new(food)
   end
 
@@ -21,6 +23,7 @@ class Board
     super(other)
 
     @snakes = @snakes.map(&:dup)
+    @living_snakes = @snakes.select(&:alive?)
     @food = @food.dup
   end
 
@@ -37,7 +40,7 @@ class Board
   end
 
   def simulate!(actions)
-    snakes = @snakes.select(&:alive?)
+    snakes = living_snakes
 
     snakes.each do |snake|
       action = actions[snake.id]
@@ -82,11 +85,13 @@ class Board
     snakes.each do |snake|
       if out_of_bounds?(snake.head)
         snake.die!
+        @living_snakes.delete(snake)
         next
       end
 
       if walls.at(snake.head.x, snake.head.y)
         snake.die!
+        @living_snakes.delete(snake)
         next
       end
 
@@ -99,6 +104,7 @@ class Board
 
       if lost_collision
         snake.die!
+        @living_snakes.delete(snake)
         next
       end
     end
