@@ -54,11 +54,15 @@ class BoardBFS
   end
 
   def _calculate(visited, food, queue)
-    width_1 = @board.width - 1
+    width = @board.width
+    width_1 = width - 1
     height_1 = @board.height - 1
 
     next_queue = queue
     queue = []
+
+    raw_visited = visited.raw_data
+    raw_food = food.raw_data
 
     distance = 0
     until next_queue.empty?
@@ -72,12 +76,15 @@ class BoardBFS
         i += 1
         x, y, snake = q[0], q[1], q[2]
 
-        unless visited.at(x,y)
-          visited.set(x, y, true)
+        #unless visited.at(x,y)
+        unless raw_visited[y * width + x]
+          raw_visited[y * width + x] = true
+          #visited.set(x, y, true)
 
           @tiles[snake] += 1
 
-          if food.at(x,y)
+          #if food.at(x,y)
+          if raw_food[y * width + x]
             @distance_to_food[snake] ||= distance
           end
 

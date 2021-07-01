@@ -7,6 +7,10 @@ class Grid
     @grid = grid || Array.new(width * height, default)
   end
 
+  def raw_data
+    @grid
+  end
+
   def get(x, y=nil)
     unless y
       y = x.y
