@@ -11,8 +11,11 @@ task :profile => :environment do
   fixture = File.read("#{__dir__}/test/fixtures/8_player_large_game.json")
   game = Game.from_json(JSON.parse(fixture))
 
-  time = Benchmark.ms { MoveDecider.new(game).next_move }
-  runs = (10000 / time).round
+  # pre-warm
+  10.times { MoveDecider.new(game).next_move }
+
+  time = Benchmark.ms { 10.times { MoveDecider.new(game).next_move  } }
+  runs = (100000 / time).round
   runs = 10 if runs < 10
   puts "testing against #{runs} runs"
   mode = ENV.fetch("STACKPROF_MODE", "cpu")

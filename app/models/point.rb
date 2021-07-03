@@ -39,7 +39,7 @@ class Point
   end
 
   def hash
-    (@y << 16) | @x
+    (@y * 256) + @x
   end
 
   def inspect
