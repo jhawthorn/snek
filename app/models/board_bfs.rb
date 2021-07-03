@@ -95,16 +95,14 @@ class BoardBFS
         end
       end
 
-      if 0 != distance
-        i = 0
-        n = @snakes.length
-        while i < n && (length = (snake = @snakes[i]).length) < distance
-          if length < distance-1 && snake.body[-distance] != snake.body[-distance-1] && !@distance_to_food[snake]
-            segment = snake.body[-distance]
-            raw_visited[segment.y * width + segment.x] = false
-          end
-          i += 1
+      i = 0
+      n = @snakes.length
+      while i < n && (length = (snake = @snakes[i]).length) < distance
+        if length < distance-1 && snake.body[-distance] != snake.body[-distance-1] && !@distance_to_food[snake]
+          segment = snake.body[-distance]
+          raw_visited[segment.y * width + segment.x] = false
         end
+        i += 1
       end
 
       distance += 1
