@@ -5,6 +5,16 @@ class SnakeController < ActionController::API
   HEAD_TYPE = "silly"
   TAIL_TYPE = "bolt"
 
+  def root
+    render json: {
+      apiversion: "1",
+      author: "jhawthorn",
+      color: COLOUR,
+      head: HEAD_TYPE,
+      tail: TAIL_TYPE
+    }
+  end
+
   def start
     json = request_json
     Storage::Game.create(
@@ -13,11 +23,7 @@ class SnakeController < ActionController::API
       snake_version: GitAdder.current_git_sha
     )
 
-    render json: {
-      color: COLOUR,
-      headType: HEAD_TYPE,
-      tailType: TAIL_TYPE
-    }
+    head :ok
   end
 
   def move

@@ -1,6 +1,4 @@
 Rails.application.routes.draw do
-  get 'home/index'
-
   concern :snake do
     post '/start', to: 'snake#start', as: nil
     post '/move',  to: 'snake#move',  as: nil
@@ -17,5 +15,5 @@ Rails.application.routes.draw do
   resources :games, only: [:index, :show]
   resources :moves, only: [:show]
 
-  root to: 'home#index'
+  root to: 'snake#root'
 end

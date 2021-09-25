@@ -16,9 +16,9 @@ class Point
   def move(direction)
     case direction
     when :up
-      Point.new(x, y-1)
-    when :down
       Point.new(x, y+1)
+    when :down
+      Point.new(x, y-1)
     when :left
       Point.new(x-1, y)
     when :right
