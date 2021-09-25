@@ -7,8 +7,8 @@ class BoardBFS
   def initialize(board, targets: nil)
     @board = board
     @snakes = board.living_snakes.dup
-    @snakes.sort_by! { |snake| -snake.length }
-    @targets = targets&.sort_by { |snake| -snake.length } || @snakes
+    @snakes.sort_by! { |snake| -snake.body.length }
+    @targets = targets&.sort_by { |snake| -snake.body.length } || @snakes
 
     @tiles = Hash.new(0).compare_by_identity
     @distance_to_food = {}.compare_by_identity
@@ -32,8 +32,9 @@ class BoardBFS
   def initial_queue
     queue = []
     @targets.each do |snake|
-      unless @board.out_of_bounds?(snake.head)
-        queue << [snake.head.x, snake.head.y, snake]
+      head = snake.body.first
+      unless @board.out_of_bounds?(head)
+        queue << [head.x, head.y, snake]
       end
     end
     queue
@@ -97,7 +98,7 @@ class BoardBFS
 
       i = 0
       n = @snakes.length
-      while i < n && (length = (snake = @snakes[i]).length) < distance
+      while i < n && (length = (snake = @snakes[i]).body.length) < distance
         if length < distance-1 && snake.body[-distance] != snake.body[-distance-1] && !@distance_to_food[snake]
           segment = snake.body[-distance]
           raw_visited[segment.y * width + segment.x] = false

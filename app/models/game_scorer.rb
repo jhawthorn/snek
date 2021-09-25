@@ -14,9 +14,11 @@ class GameScorer
     player = @game.player
     return { dead: SCORE_MIN } unless player.alive?
 
+    live_enemies = @game.enemies.select { |x| x.alive? }
+
     # If there was at least one enemy, but now is dead, victory
     # Necessary so we still somewhat play a single player game
-    if @game.enemies.any? && @game.enemies.none?(&:alive?)
+    if live_enemies.empty? && @game.enemies.any?
       return { won: SCORE_MAX }
     end
 
@@ -35,7 +37,7 @@ class GameScorer
     # Make it urgent if we are near death
     distance_to_food *= 10 if player.health < 20
 
-    enemies = @game.enemies.select(&:alive?)
+    enemies = live_enemies
 
     player_voronoi = @bfs.tiles[player]
     player_reachable = @reachable_bfs.tiles[player]

@@ -12,6 +12,7 @@ class MoveDecider
     end
 
     @scorer_builder = scorer || ->(g){ GameScorer.new(g) }
+    @reasonable_moves = nil
   end
 
   def considered_snakes
