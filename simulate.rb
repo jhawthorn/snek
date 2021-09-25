@@ -68,7 +68,7 @@ def eliminate(initial_pop, desired)
 
   wins = Hash.new(0)
 
-  matches = 256.times.flat_map { pop.shuffle.each_slice(4).to_a }
+  matches = 64.times.flat_map { pop.shuffle.each_slice(4).to_a }
   Parallel.map(matches, in_processes: N_PROC, progress: "Simulating") do |(a, b)|
     winner, _loser = winner_losers_from(a, b)
 
@@ -124,6 +124,10 @@ def test_vs_hand_tuned(best)
   puts "  wins: #{wins}, losses: #{losses}"
 end
 
+## WARM
+puts "warming..."
+5.times { winner_losers_from(nil, nil) }
+
 ROUNDS = 20
 ROUNDS.times do
   puts "Round #{i}"
@@ -141,10 +145,10 @@ ROUNDS.times do
   File.write("tmp/population/pop-#{Time.now.strftime("%F-%H-%M-%S")}-#{i}.rb", pop.inspect)
 
   # Show one round for fun
-  #winner, _ = winner_losers_from(*pop.sample(4), verbose: true)
-  #puts "vs. hand tuned scorer..."
-  #winner, _= winner_losers_from(best, nil, verbose: true)
-  #puts winner.nil? ? "  lost" : "  won"
+  winner, _ = winner_losers_from(*pop.sample(4), verbose: true)
+  puts "vs. hand tuned scorer..."
+  winner, _= winner_losers_from(best, nil, verbose: true)
+  puts winner.nil? ? "  lost" : "  won"
 
   test_vs_hand_tuned(best)
 
