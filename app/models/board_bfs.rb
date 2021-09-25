@@ -78,14 +78,14 @@ class BoardBFS
         x, y, snake = q[0], q[1], q[2]
 
         #unless visited.at(x,y)
-        unless raw_visited[y * width + x]
-          raw_visited[y * width + x] = true
+        unless raw_visited[y * 16 | x]
+          raw_visited[y * 16 | x] = true
           #visited.set(x, y, true)
 
           @tiles[snake] += 1
 
           #if food.at(x,y)
-          if raw_food[y * width + x]
+          if raw_food[y * 16 | x]
             @distance_to_food[snake] ||= distance
           end
 
@@ -101,7 +101,7 @@ class BoardBFS
       while i < n && (length = (snake = @snakes[i]).body.length) < distance
         if length < distance-1 && snake.body[-distance] != snake.body[-distance-1] && !@distance_to_food[snake]
           segment = snake.body[-distance]
-          raw_visited[segment.y * width + segment.x] = false
+          raw_visited[segment.y * 16 | segment.x] = false
         end
         i += 1
       end
