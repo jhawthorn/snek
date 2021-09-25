@@ -24,8 +24,9 @@ RUN \
 ADD . ./
 
 RUN \
-  SECRET_KEY_BASE=1 bundle exec rake assets:precompile
+  bundle exec rake assets:precompile
 
 EXPOSE 3000
+VOLUME /data
 
-CMD ["bundle", "exec", "rails", "server", "-b", "0.0.0.0", "-p", "3000"]
+CMD ["/bin/bash", "/app/docker_init.sh"]
