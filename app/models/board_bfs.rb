@@ -4,7 +4,7 @@ class BoardBFS
   attr_reader :tiles
   attr_reader :distance_to_food
 
-  def initialize(board, targets: nil)
+  def initialize(board, targets = nil)
     @board = board
     @snakes = board.living_snakes.dup
     @snakes.sort_by! { |snake| -snake.body.length }
@@ -21,7 +21,7 @@ class BoardBFS
     @targets.each do |snake|
       visited.set_all(snake.tail, true)
     end
-    unless @snakes == @targets
+    unless @snakes.equal?(@targets)
       (@snakes - @targets).each do |snake|
         visited.set_all(snake.body, true)
       end

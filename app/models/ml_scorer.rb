@@ -6,21 +6,20 @@ class MlScorer
   EDGES = SHAPE.each_cons(2).map{|a,b| a * b }
   CARDINALITY = EDGES.sum
 
-  attr_reader :bfs
+  attr_reader :bfs, :player
 
   def initialize(game, bfs: nil, weights:)
     @game = game
-    @bfs = bfs || BoardBFS.new(@game.board)
-    @reachable_bfs = BoardBFS.new(@game.board, targets: [@game.player])
+    @player = @game.player
+    if @player.alive?
+      @bfs = bfs || BoardBFS.new(@game.board)
+      @reachable_bfs = BoardBFS.new(@game.board, [@game.player])
+    end
 
     weights = weights.dup
     @weights = EDGES.map do |n|
       weights.shift(n)
     end
-  end
-
-  def player
-    @player ||= @game.player
   end
 
   def lost?

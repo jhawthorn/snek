@@ -7,7 +7,7 @@ class GameScorer
   def initialize(game, bfs: nil)
     @game = game
     @bfs = bfs || BoardBFS.new(@game.board)
-    @reachable_bfs = BoardBFS.new(@game.board, targets: [@game.player])
+    @reachable_bfs = BoardBFS.new(@game.board, [@game.player])
   end
 
   def score_description
@@ -47,8 +47,8 @@ class GameScorer
       length: 25 * player.length,
       health: 1 * player.health,
       enemy_remaining: -50 * enemies.count,
-      enemy_max_length: -1 * (enemies.map(&:length).max || 0),
-      enemy_length: -1 * enemies.sum(&:length),
+      enemy_max_length: -1 * (enemies.map { |x| x.length }.max || 0),
+      enemy_length: -1 * enemies.sum { |x| x.length },
 
       player_voronoi: 1 * player_voronoi,
       player_reachable: 2 * player_reachable,
