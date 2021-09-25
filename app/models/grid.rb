@@ -4,7 +4,7 @@ class Grid
   def initialize(width, height, default: nil, grid: nil)
     @width = width
     @height = height
-    @grid = grid || Array.new(width * height, default)
+    @grid = grid || Array.new(height << 4, default)
   end
 
   def raw_data
@@ -17,16 +17,16 @@ class Grid
       x = x.x
     end
     raise if x < 0 || y < 0 || x >= @width || y >= @height
-    @grid[y * @width + x]
+    @grid[(y << 4) | x]
   end
 
   def at(x, y)
-    @grid[y * @width + x]
+    @grid[(y << 4) | x]
   end
 
   def set(x, y, value)
     raise if x < 0 || y < 0 || x >= @width || y >= @height
-    @grid[y * @width + x] = value
+    @grid[(y << 4) | x] = value
   end
 
   def set_all(points, value)
