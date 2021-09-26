@@ -13,9 +13,7 @@ def random_weights
 end
 
 def new_population(n)
-  pop = Array.new(n) { random_weights }
-  pop[0] = DefaultWeights
-  pop
+  Array.new(n) { random_weights }
 end
 
 def winner_losers_from(*snakes, verbose: false)
@@ -68,7 +66,7 @@ def eliminate(initial_pop, desired)
 
   wins = Hash.new(0)
 
-  matches = 128.times.flat_map { pop.shuffle.each_slice(4).to_a }
+  matches = 512.times.flat_map { pop.shuffle.each_slice(4).to_a }
   Parallel.map(matches, in_processes: N_PROC, progress: "Simulating") do |(a, b)|
     winner, _loser = winner_losers_from(a, b)
 
@@ -107,8 +105,11 @@ end
 i = 0
 POP = 128
 ADVANCE = 16
-pop = eval(File.read("tmp/population.rb"))
-#pop = new_population(POP)
+pop = eval(File.read("tmp/population.rb")) rescue nil
+if !pop
+  puts "Generating new population from scratch"
+  pop = new_population(POP)
+end
 pop = reproduce(pop, POP)
 ROUNDS_VS_TUNED = 100
 
@@ -128,7 +129,7 @@ end
 puts "warming..."
 5.times { winner_losers_from(nil, nil) }
 
-ROUNDS = 20
+ROUNDS = 100
 ROUNDS.times do
   puts "Round #{i}"
   i += 1
@@ -147,9 +148,6 @@ ROUNDS.times do
 
   # Show one round for fun
   winner, _ = winner_losers_from(*pop.sample(4), verbose: true)
-  puts "vs. hand tuned scorer..."
-  winner, _= winner_losers_from(best, nil, verbose: true)
-  puts winner.nil? ? "  lost" : "  won"
 
   test_vs_hand_tuned(best)
 

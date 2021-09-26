@@ -2,7 +2,7 @@ class MlScorer
   SCORE_MIN = -999999999
   SCORE_MAX =  999999999
 
-  SHAPE = [8, 8, 4, 1]
+  SHAPE = [10, 10, 6, 4, 1]
   EDGES = SHAPE.each_cons(2).map{|a,b| a * b }
   CARDINALITY = EDGES.sum
 
@@ -69,10 +69,16 @@ class MlScorer
 
     player_reachable = @reachable_bfs.tiles[player]
 
+    hazards = @game.board.hazards
+    in_hazard = hazards.include?(player.head)
+    total_hazards = hazards.size
 
     [
       player.length,
       player.health,
+
+      in_hazard ? 0 : 1,
+      total_hazards,
 
       #enemies.count,
       #enemies.map(&:length).max || 0,
