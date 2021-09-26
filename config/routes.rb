@@ -1,9 +1,9 @@
 Rails.application.routes.draw do
   concern :snake do
     get '/', to: 'snake#root', as: nil
+    post '/start',  to: 'snake#start',  as: nil
     post '/move',  to: 'snake#move',  as: nil
     post '/end',   to: 'snake#end',   as: nil
-    post '/ping',  to: 'snake#ping',  as: nil
   end
 
   concerns :snake
