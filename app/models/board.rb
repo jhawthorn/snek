@@ -1,13 +1,14 @@
 class Board
-  attr_reader :snakes, :width, :height, :food
+  attr_reader :snakes, :width, :height, :food, :hazards
   attr_reader :living_snakes
 
-  def initialize(width: 11, height: width, snakes: [], food: [])
+  def initialize(width: 11, height: width, snakes: [], food: [], hazards: [])
     @width = width
     @height = height
     @snakes = snakes
     @living_snakes = snakes.select(&:alive?)
     @food = Set.new(food)
+    @hazards = Set.new(hazards)
   end
 
   def self.from_json(data)
@@ -15,7 +16,8 @@ class Board
       width: data['width'],
       height: data['height'],
       snakes: data['snakes'].map { |s| Snake.from_json(s) },
-      food: data['food'].map { |f| Point.from_json(f) }
+      food: data['food'].map { |f| Point.from_json(f) },
+      hazards: data['hazards'].map { |x| Point.from_json(x) }
     )
   end
 
@@ -57,6 +59,9 @@ class Board
     end
 
     snakes.each do |snake|
+      if @hazards.include?(snake.head)
+        snake.health -= 14
+      end
       snake.health -= 1
     end
 
