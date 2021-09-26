@@ -8,12 +8,16 @@ class Storage::Move < ApplicationRecord
 
   validates :game_id, :turn, :snake_version, :decision, :state, :runtime, presence: true
 
+  def scorer
+    game.default_scorer
+  end
+
   def heuristic_score
-    @score ||= GameScorer.new(simulated_game).score
+    @score ||= scorer.call(simulated_game).score
   end
 
   def move_decider
-    @move_decider ||= MoveDecider.new(simulated_game)
+    @move_decider ||= MoveDecider.new(simulated_game, scorer: default_scorer)
   end
 
   def remaining_snakes

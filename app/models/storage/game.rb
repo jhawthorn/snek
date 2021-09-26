@@ -18,6 +18,10 @@ class Storage::Game < ApplicationRecord
     end
   end
 
+  def default_scorer
+    ->(g) { MlScorer.new(g, weights: DefaultWeights) }
+  end
+
   serialize :initial_state, JSON
   serialize :move_data, GzipJSON
 
