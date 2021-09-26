@@ -68,7 +68,7 @@ def eliminate(initial_pop, desired)
 
   wins = Hash.new(0)
 
-  matches = 64.times.flat_map { pop.shuffle.each_slice(4).to_a }
+  matches = 128.times.flat_map { pop.shuffle.each_slice(4).to_a }
   Parallel.map(matches, in_processes: N_PROC, progress: "Simulating") do |(a, b)|
     winner, _loser = winner_losers_from(a, b)
 
@@ -135,7 +135,8 @@ ROUNDS.times do
   pop = eliminate(pop, 64)
   pop = eliminate(pop, 32)
   pop = eliminate(pop, 16)
-  best = pop[0]
+  #best = pop[0]
+  best = eliminate(pop, 1)[0]
 
   puts "best: #{best.inspect}"
   File.write("tmp/best_snake.rb", best.inspect)
