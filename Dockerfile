@@ -29,4 +29,7 @@ RUN \
 EXPOSE 3000
 VOLUME /data
 
+ARG REVISION
+ENV REVISION=$REVISION
+
 CMD ["/bin/bash", "/app/docker_init.sh"]
