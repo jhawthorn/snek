@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "net/http"
+
 class Storage::Game < ApplicationRecord
   module GzipJSON
     extend self
