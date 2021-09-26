@@ -9,6 +9,10 @@ class Simulation
     @width = @height = size
     @scorer = scorer
 
+    # hazards
+    @minx = @miny = 0
+    @maxx = @maxy = size - 1
+
     possible_spawns = [
       Point.new(1, 1),
       Point.new(width/2, 1),
@@ -92,7 +96,17 @@ class Simulation
     @board.simulate!(actions)
 
     @turn += 1
-    spawn_food! if turn > 0 && (turn % 10) == 0
+
+    food_spawn_chance = 15
+
+    if rand(100) < food_spawn_chance || @board.food.empty?
+      spawn_food!
+    end
+
+    hazard_turns = 20
+    if (@turn % hazard_turns) == 0 && @turn > 0
+      shrink_hazard!
+    end
   end
 
   def spawn_food!
@@ -110,6 +124,27 @@ class Simulation
     food -= existing
 
     @board.food.merge food
+  end
+
+  def shrink_hazard!
+    case rand(4)
+    when 0
+      @minx += 1
+    when 1
+      @maxx -= 1
+    when 2
+      @miny += 1
+    when 3
+      @maxy -= 1
+    end
+
+    0.upto(height) do |y|
+      0.upto(width) do |x|
+        if x < @minx || x > @maxx || y < @miny || y > @maxy
+          @board.hazards.add(Point.new(x,y))
+        end
+      end
+    end
   end
 
   def over?
