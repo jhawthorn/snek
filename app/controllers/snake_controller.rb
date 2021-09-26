@@ -2,7 +2,7 @@ require 'snake'
 
 class SnakeController < ActionController::API
   COLOUR = "#6aec87"
-  HEAD_TYPE = "silly"
+  HEAD_TYPE = "caffeine"
   TAIL_TYPE = "bolt"
 
   def root
