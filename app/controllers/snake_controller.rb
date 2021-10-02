@@ -1,7 +1,7 @@
 require 'snake'
 
 class SnakeController < ActionController::API
-  COLOUR = "#6aec87"
+  COLOUR = "#cc342d"
   HEAD_TYPE = "caffeine"
   TAIL_TYPE = "bolt"
 
